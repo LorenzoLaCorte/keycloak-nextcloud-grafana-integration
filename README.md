@@ -2,7 +2,11 @@
 
 Exam project
 
-...authors, ...
+Authors: Simone Aquilini - Luca Ferrari - Lorenzo La Corte
+
+## Notes 
+
+VMs are named VM1 and VM2, hard disk is 20GB and memory is 4096MB
 
 ## Facilities available
 

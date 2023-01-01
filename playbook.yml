@@ -3,7 +3,6 @@
   hosts: all
   become: true
   roles:
-  - nfs
   - docker
   - docker_swarm
   - registry
@@ -13,3 +12,13 @@
   - monitoring
   - logging
   - dashboard
+
+- hosts: nfs-servers
+  become: true
+  roles:
+  - nfs-server
+  
+- hosts: nfs-clients
+  become: true
+  roles:
+  - nfs-client

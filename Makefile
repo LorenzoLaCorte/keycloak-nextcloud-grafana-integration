@@ -14,12 +14,16 @@ ansible-prepare: update-venv
 	. $(VENV_ACTIVATE_PATH) && ansible-galaxy collection install -r requirements.yml
 	. $(VENV_ACTIVATE_PATH) && ansible-galaxy role install -r requirements.yml
 
+.PHONY: ansible-ping
+ansible-ping:
+	ansible -m ping -i inventory.yml all
+
 .PHONY: run-ansible
 run-ansible: ansible-prepare
 	. $(VENV_ACTIVATE_PATH) && ansible-playbook \
 		--inventory inventory.yml \
 		--ssh-common-args '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' \
-		--verbose \
+		--verbose -vv \
 		$(ANSIBLE_ARGS) \
 		$(ANSIBLE_PLAYBOOK)
 
@@ -66,7 +70,8 @@ update-venv: venv
 # VCC
 #
 VCC_ROLES := \
-	nfs \
+	nfs-client \
+	nfs-servers \
 	docker \
 	docker_swarm \
 	registry \

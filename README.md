@@ -22,6 +22,49 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 
 ---> Snapshot Taken: snap1
 
+### Task 2,3,4
+
+- CONFIGURING ANSIBLE:
+- set up inventory.yml file with  
+  - NFS configuration for 2 nodes: nfs-client and nfs-server
+  - set up of ssh key on both nodes
+- create and configure the 2 roles nfs-client and nfs-server
+- change playbook.yml adding host nfs-server and nfs-client
+- change requirements.yml
+- change makefile
+
+- CONFIGURING NETWORK:
+- changed netplan configuring storage network
+  - 10.255.255.10 for node1
+  - 10.255.255.20 for node2
+
+- CONFIGURING SSH:
+- ssh-keygen # it generates keys in /home/node1/.ssh
+
+- from the folder /home/node1/.ssh
+  - ssh-copy-id node1@192.168.50.10
+  - ssh node1@192.168.50.10 # should not request pwd
+
+  - ssh-copy-id node2@192.168.50.20
+  - ssh node2@192.168.50.20 # should not request pwd
+
+- then, in inventory we can set:
+      ansible_ssh_private_key_file: /home/node1/.ssh/id_rsa
+
+- TROUBLESHOOTING THE ERROR "Missing sudo password"
+- in node1:
+  - sudo nano /etc/sudoers.d/devops # insert a line
+  - node1 ALL=(ALL) NOPASSWD: ALL
+
+- in node2:
+  - sudo nano /etc/sudoers.d/devops # insert a line
+  - node2 ALL=(ALL) NOPASSWD: ALL
+
+- make venv
+- make ansible-run
+
+--> Snapshot Taken: snap2
+ 
 ## Facilities available
 
 - `make run-ansible` runs the Ansible playbook

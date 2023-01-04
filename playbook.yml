@@ -23,4 +23,10 @@
   roles:
     - nfs-client
     - docker_swarm-worker 
-    - registry-client 
+    - registry-client
+
+- name: Instructing Docker hosts to trust TLS certificate
+  hosts: all
+  become: true
+  roles:
+  - registry-tls-common    

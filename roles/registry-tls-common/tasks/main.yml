@@ -1,0 +1,7 @@
+---
+# If follow=yes, /path/to/file will be overwritten by contents of foo.conf
+- name: Instructing a single Docker host to trust TLS certificate
+  ansible.builtin.copy:
+    src: "{{ src_path }}"
+    dest: "{{ dest_path }}"  # link to /path/to/file
+    follow: yes

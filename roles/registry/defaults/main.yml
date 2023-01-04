@@ -1,1 +1,3 @@
 ---
+certs_dir: /data/docker-registry/certs
+data_dir: /data/docker-registry

@@ -1,29 +1,56 @@
 ---
-- name: Create certs folder
-  shell: mkdir -p /data/certs
+- name: Create certificates directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ certs_dir }}"
+    state: directory
+    mode: '0755'
+
+#- name: Create SSL certificate
+#  openssl_certificate:
+#    path: "{{ certs_dir }}/key.crt"
+#    privatekey_path: "{{ certs_dir }}/key.key" 
+#    provider: selfsigned
 
 - name: Create private key (RSA, 4096 bits)
   community.crypto.openssl_privatekey:
-    path: /data/certs/domain.key
+    path: "{{ certs_dir }}/key.key"
+
+#- name: Create simple self-signed certificate
+#  community.crypto.x509_certificate:
+#    path: "{{ certs_dir }}/key.crt"
+#    privatekey_path: "{{ certs_dir }}/key.key"
+#    provider: selfsigned 
 
 - name: Create simple self-signed certificate
-  community.crypto.x509_certificate:
-    path: /data/certs/domain.pem
-    privatekey_path: /data/certs/domain.key
-    provider: selfsigned      
-
-#- name: Create self-signed certificates
-#  shell: openssl req -newkey rsa:4096 -days 365 -nodes -x509 -keyout /data/certs/domain.key -out /data/certs/domain.crt 
+  community.crypto.openssl_csr:
+    path: "{{ certs_dir }}/key.crt"
+    privatekey_path: "{{ certs_dir }}/key.key"
+    subject_alt_name: "DNS:myregistry.domain.com"     
 
 - name: Deploy Registry
-  community.docker.docker_container:
+  community.docker.docker_swarm_service:
     name: registry
     image: distribution/distribution:2.8.1
-    ports:
-      - 5001:5001
-    volumes:
-      - /data/docker-registry:/var/lib/registry
-      - /data/certs:/certs
+    placement:
+      constraints:
+        - node.role == manager
+    publish:
+      - published_port: 8080
+        target_port: 443
     env:
-      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.pem
-      REGISTRY_HTTP_TLS_KEY: /certs/domain.key
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: "{{ data_dir }}"
+      REGISTRY_HTTP_TLS_CERTIFICATE: "{{ certs_dir }}/key.crt"
+      REGISTRY_HTTP_TLS_KEY: "{{ certs_dir }}/key.key"  
+
+#- name: Deploy Registry
+#  community.docker.docker_container:
+#    name: registry
+#    image: distribution/distribution:2.8.1
+#    ports:
+#      - 5001:5001
+#    volumes:
+#      - /data/docker-registry:/var/lib/registry
+#      - /data/certs:/certs
+#    env:
+#      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.pem
+#      REGISTRY_HTTP_TLS_KEY: /certs/domain.key

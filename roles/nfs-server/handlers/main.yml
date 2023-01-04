@@ -1,4 +1,5 @@
 ---
+# this task will be run when notified about a change
 - name: Restart NFS server
   ansible.builtin.systemd:
     name: nfs-kernel-server

@@ -1,0 +1,8 @@
+---
+#- name: Log into private registry
+#  community.docker.docker_login:
+#    registry_url: "{{ hostvars[groups['nfs-servers'][0]]['ansible_host'] }}:5001"
+#    client_cert: /data/certs/domain.pem
+#    client_key: /data/certs/domain.key
+#    validate_certs: true
+    

@@ -71,10 +71,12 @@ update-venv: venv
 #
 VCC_ROLES := \
 	nfs-client \
-	nfs-servers \
+	nfs-server \
 	docker \
-	docker_swarm \
+	docker_swarm-manager \
+	docker_swarm-worker \
 	registry \
+	registry-client \
 	database \
 	keycloak \
 	nextcloud \

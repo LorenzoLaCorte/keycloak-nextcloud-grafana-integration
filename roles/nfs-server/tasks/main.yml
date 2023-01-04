@@ -1,16 +1,17 @@
 ---
+# variables are referred with the following syntax: "{{var_name}}"
 - name: "Create NFS export directory {{ nfs_share_path }}"
-  ansible.builtin.file:
+  ansible.builtin.file: # creates directory if it doesn't exist
     path: "{{ nfs_share_path }}"
     state: directory
 
 - name: Install NFS server
-  ansible.builtin.apt:
+  ansible.builtin.apt:  # install something
     name: nfs-kernel-server
 
 - name: Template NFS /etc/exports
   ansible.builtin.template:
-    src: exports
-    dest: /etc/exports
+    src: exports # take the content from src
+    dest: /etc/exports # copy it on destination at this path
   notify:
-  - Restart NFS server
+  - Restart NFS server # task inside handlers to run action when something has changed

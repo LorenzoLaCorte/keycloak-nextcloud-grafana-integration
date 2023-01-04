@@ -4,8 +4,6 @@
   become: true
   roles:
   - docker
-  - docker_swarm
-  - registry
   - database
   - keycloak
   - nextcloud
@@ -16,9 +14,13 @@
 - hosts: nfs-servers
   become: true
   roles:
-  - nfs-server
+    - nfs-server
+    - docker_swarm-manager
+    - registry
   
 - hosts: nfs-clients
   become: true
   roles:
-  - nfs-client
+    - nfs-client
+    - docker_swarm-worker 
+    - registry-client 

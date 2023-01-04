@@ -1,5 +1,7 @@
 # {{ ansible_managed }}
-{% for node in groups['nfs-clients'] %}
+# this file represent exports file in NFS server
+# see magic variables of ansible (groups is one of them)
+{% for node in groups['nfs-clients'] %} # jinja2 (python framework) syntax
 # Index: {{ loop.index }} Index0: {{ loop.index0 }} Hostname: {{ node }}
 {{ nfs_share_path }} {{ hostvars[node]['ansible_host'] }}({{ nfs_export_options | join(',') }})
 {% endfor %}

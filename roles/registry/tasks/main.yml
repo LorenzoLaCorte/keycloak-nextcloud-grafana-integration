@@ -1,1 +1,29 @@
 ---
+- name: Create certs folder
+  shell: mkdir -p /data/certs
+
+- name: Create private key (RSA, 4096 bits)
+  community.crypto.openssl_privatekey:
+    path: /data/certs/domain.key
+
+- name: Create simple self-signed certificate
+  community.crypto.x509_certificate:
+    path: /data/certs/domain.pem
+    privatekey_path: /data/certs/domain.key
+    provider: selfsigned      
+
+#- name: Create self-signed certificates
+#  shell: openssl req -newkey rsa:4096 -days 365 -nodes -x509 -keyout /data/certs/domain.key -out /data/certs/domain.crt 
+
+- name: Deploy Registry
+  community.docker.docker_container:
+    name: registry
+    image: distribution/distribution:2.8.1
+    ports:
+      - 5001:5001
+    volumes:
+      - /data/docker-registry:/var/lib/registry
+      - /data/certs:/certs
+    env:
+      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.pem
+      REGISTRY_HTTP_TLS_KEY: /certs/domain.key

@@ -16,11 +16,11 @@
   roles:
     - nfs-server
     - docker_swarm-manager
-    - registry
+    # - registry
   
 - hosts: nfs-clients
   become: true
   roles:
     - nfs-client
     - docker_swarm-worker 
-    - registry-client 
+    # - registry-client 

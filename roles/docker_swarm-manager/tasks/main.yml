@@ -2,4 +2,5 @@
 - name: Init a new swarm with default parameters
   community.docker.docker_swarm:
     state: present  
+    advertise_addr: "{{ hostvars[groups['nfs-servers'][0]]['ansible_host'] }}"
   register: swarm_params

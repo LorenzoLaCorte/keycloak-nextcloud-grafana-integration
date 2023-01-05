@@ -35,10 +35,12 @@
       constraints:
         - node.role == manager
     publish:
-      - published_port: 8080
+      - published_port: 5000
         target_port: 443
     env:
       REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: "{{ data_dir }}"
+      # REGISTRY_HTTP_ADDR: "0.0.0.0:443"
+      REGISTRY_HTTP_HOST: https://10.255.255.10:5000
       REGISTRY_HTTP_TLS_CERTIFICATE: "{{ certs_dir }}/key.crt"
       REGISTRY_HTTP_TLS_KEY: "{{ certs_dir }}/key.key"  
 

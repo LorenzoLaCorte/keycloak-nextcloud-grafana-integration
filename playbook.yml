@@ -11,16 +11,29 @@
   - logging
   - dashboard
 
-- hosts: nfs-servers
+- name: NFS server, Swarm cluster and registry init
+  hosts: nfs-servers
   become: true
   roles:
     - nfs-server
     - docker_swarm-manager
-    # - registry
+    - registry
   
-- hosts: nfs-clients
+- name: NFS client and Swarm worker join
+  hosts: nfs-clients
   become: true
   roles:
     - nfs-client
-    - docker_swarm-worker 
-    # - registry-client 
+    - docker_swarm-worker
+
+- name: Instructing Docker hosts to trust TLS certificate
+  hosts: all
+  become: true
+  roles:
+    - registry-tls-common
+
+- name: Registry login
+  hosts: nfs-clients
+  become: true
+  roles:
+    - registry-client       

@@ -23,7 +23,7 @@ run-ansible: ansible-prepare
 	. $(VENV_ACTIVATE_PATH) && ansible-playbook \
 		--inventory inventory.yml \
 		--ssh-common-args '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' \
-		--verbose -vv \
+		--verbose -v \
 		$(ANSIBLE_ARGS) \
 		$(ANSIBLE_PLAYBOOK)
 

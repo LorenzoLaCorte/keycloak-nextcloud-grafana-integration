@@ -24,7 +24,7 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 
 ### Task 2,3,4
 
-- CONFIGURING ANSIBLE:
+#### Configuring Ansible
 - set up inventory.yml file with  
   - NFS configuration for 2 nodes: nfs-client and nfs-server
   - set up of ssh key on both nodes
@@ -33,12 +33,12 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 - change requirements.yml
 - change makefile
 
-- CONFIGURING NETWORK:
+#### Configuring Network
 - changed netplan configuring storage network
   - 10.255.255.10 for node1
   - 10.255.255.20 for node2
 
-- CONFIGURING SSH:
+#### Configuring SSH
 - ssh-keygen # it generates keys in /home/node1/.ssh
 
 - from the folder /home/node1/.ssh
@@ -51,7 +51,7 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 - then, in inventory we can set:
       ansible_ssh_private_key_file: /home/node1/.ssh/id_rsa
 
-- TROUBLESHOOTING THE ERROR "Missing sudo password"
+#### Troubleshooting "Missing sudo password"
 - in node1:
   - sudo nano /etc/sudoers.d/devops # insert a line
   - node1 ALL=(ALL) NOPASSWD: ALL
@@ -59,9 +59,6 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 - in node2:
   - sudo nano /etc/sudoers.d/devops # insert a line
   - node2 ALL=(ALL) NOPASSWD: ALL
-
-- make venv
-- make ansible-run
 
 --> Snapshot Taken: task4
  
@@ -80,6 +77,11 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
     - to use them in links we have to lowercase them -> | lower
 
 --> Snapshot Taken: task6
+
+### Task 7,8,9
+#### Docker Swarm Manager
+#### Docker Swarm Client
+
 
 ## Facilities available
 

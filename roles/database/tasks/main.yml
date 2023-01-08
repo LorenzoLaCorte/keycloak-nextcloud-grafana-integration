@@ -1,15 +1,27 @@
 ---
+- name: Create postgres data directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ postgres_data_dir }}"
+    state: directory
+    mode: '0755'
+
 - name: Deploy Postgres
   community.docker.docker_swarm_service:
     name: postgres
     image: postgres:15.1
-    #placement:
-    #  constraints:
-    #    - node.role == manager
+    mode: global  # each service has its own db
     publish:
       - published_port: 5432
         target_port: 5432
     mounts:
-      - source: /data/postgresql
+      - source: "{{ postgres_data_dir }}"
         target: /var/lib/postgresql/data
         type: bind
+
+      - source: /home/node1/Progetto_VCC/vcc-exam-sll-certificate/examples/postgres/sql
+        target: /docker-entrypoint-initdb.d
+        type: bind  
+    env:
+      POSTGRES_DB: vcc-test
+      POSTGRES_USER: vcc-test
+      POSTGRES_PASSWORD: vcc-test   

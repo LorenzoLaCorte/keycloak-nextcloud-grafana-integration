@@ -17,7 +17,11 @@ http:
 auth:
   htpasswd:
     realm: registry_realm
-    path: /docker-registry/htpasswd   
+    path: /docker-registry/htpasswd
+#proxy:
+#  remote_url: https://registry-1.docker.io
+#  username: username
+#  password: password     
 health:
   storagedriver:
     enabled: true

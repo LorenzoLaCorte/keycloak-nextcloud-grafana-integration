@@ -1,19 +1,19 @@
 ---
+- name: Set file content as a fact
+  ansible.builtin.set_fact:
+    user_psw: "{{ lookup('file', '{{ psw_file }}').splitlines() | first }}"
+  register: file_content 
+
 - name: Log into private registry with TLS and client certificates
   community.docker.docker_login:
-    registry_url: "https://10.255.255.10:5000"
+    registry_url: https://10.255.255.10:5000
     tls: yes
-    ca_cert: /data/docker-registry/certs/key.crt
-    client_cert: /data/docker-registry/certs/key.crt
-    client_key: /data/docker-registry/certs/key.key
-    username: root
-    password: password
+    ca_cert: /data/docker-registry/certs/fullchain.pem
+    client_cert: /data/docker-registry/certs/fullchain.pem
+    client_key: /data/docker-registry/certs/privkey.pem
+    username: "{{ hostvars['node2'].file_content['ansible_facts']['user_psw'] |  split(':') | first }}"
+    password: "{{ hostvars['node2'].file_content['ansible_facts']['user_psw'] |  split(':') | last }}"
+    tls_hostname: myregistry.domain.com
     reauthorize: true
     validate_certs: true
-
-#- name: Log into private registry
-#  community.docker.docker_login:
-#    registry_url: "https://myregistry.domain.com:5000"
-#    tls: true
-#    validate_certs: true
     

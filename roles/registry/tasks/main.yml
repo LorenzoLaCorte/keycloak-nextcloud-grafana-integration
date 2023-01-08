@@ -5,15 +5,77 @@
     state: directory
     mode: '0755'
 
-#- name: Create SSL certificate
-#  openssl_certificate:
-#    path: "{{ certs_dir }}/key.crt"
-#    privatekey_path: "{{ certs_dir }}/key.key" 
-#    provider: selfsigned
-
 - name: Create private key (RSA, 4096 bits)
   community.crypto.openssl_privatekey:
-    path: "{{ certs_dir }}/key.key"
+    path: "{{ certs_dir }}/privkey.pem"
+
+- name: Generate an OpenSSL CSR.
+  openssl_csr:
+    path: "{{ certs_dir }}/domain.csr"
+    privatekey_path: "{{ certs_dir }}/privkey.pem"
+    common_name: myregistry.domain.com
+    subject_alt_name: "IP:10.255.255.10" 
+
+- name: Generate a Self Signed OpenSSL certificate.
+  openssl_certificate:
+    path: "{{ certs_dir }}/fullchain.pem"
+    privatekey_path: "{{ certs_dir }}/privkey.pem"
+    csr_path: "{{ certs_dir }}/domain.csr"
+    provider: selfsigned
+
+- name: Copy certificate into ca-certificates dir
+  ansible.builtin.copy:
+    src: "{{ certs_dir }}/fullchain.pem"
+    dest: /usr/local/share/ca-certificates/domain.crt  # link to /path/to/file
+    follow: yes
+
+- name: Update cert index
+  shell: /usr/sbin/update-ca-certificates
+
+- name: Restart Docker service
+  ansible.builtin.systemd:
+    state: restarted
+    daemon_reload: yes
+    name: docker     
+
+- name: Create random password
+  ansible.builtin.set_fact:
+    reg_password: "{{ lookup('ansible.builtin.password', '/dev/null', seed=inventory_hostname) }}"
+  register: psw_creation_result  
+
+- name: Create setup file with content
+  copy:
+    dest: "{{ psw_file }}"   
+    content: |
+      {{ registry_username }}:{{ hostvars['node1'].psw_creation_result['ansible_facts']['reg_password'] }}
+
+- name: Create htpasswd file
+  ansible.builtin.file:
+    path: "{{ registry_htpasswd_file }}"
+    state: touch
+    mode: '0755'
+
+- name: Set file content as a fact
+  ansible.builtin.set_fact:
+    psw_to_insert: "{{ lookup('file', '{{ psw_file }}').splitlines() }}"
+  register: file_content  
+
+- name: Make sure we can use htpasswd module
+  apt: "pkg=python3-passlib state=present"
+
+- name: Insert passwords in htpasswd file
+  community.general.htpasswd:
+    path: "{{ registry_htpasswd_file }}"
+    name: "{{ item | split(':') | first }}"
+    password: "{{ item | split(':') | last }}"
+    crypt_scheme: bcrypt
+  with_items: "{{ hostvars['node1'].file_content['ansible_facts']['psw_to_insert'] }}"
+
+#- name: Create SSL certificate
+#  openssl_certificate:
+#    path: "{{ certs_dir }}/domain.crt"
+#    privatekey_path: "{{ certs_dir }}/domain.key" 
+#    provider: selfsigned
 
 #- name: Create simple self-signed certificate
 #  community.crypto.x509_certificate:
@@ -21,11 +83,11 @@
 #    privatekey_path: "{{ certs_dir }}/key.key"
 #    provider: selfsigned 
 
-- name: Create simple self-signed certificate
-  community.crypto.openssl_csr:
-    path: "{{ certs_dir }}/key.crt"
-    privatekey_path: "{{ certs_dir }}/key.key"
-    subject_alt_name: "DNS:myregistry.domain.com"     
+#- name: Create simple self-signed certificate
+#  community.crypto.openssl_csr:
+#    path: "{{ certs_dir }}/domain.crt"
+#    privatekey_path: "{{ certs_dir }}/domain.key"
+#    subject_alt_name: "DNS:myregistry.domain.com"     
 
 - name: Deploy Registry
   community.docker.docker_swarm_service:
@@ -37,22 +99,15 @@
     publish:
       - published_port: 5000
         target_port: 443
-    env:
-      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: "{{ data_dir }}"
-      # REGISTRY_HTTP_ADDR: "0.0.0.0:443"
-      REGISTRY_HTTP_HOST: https://10.255.255.10:5000
-      REGISTRY_HTTP_TLS_CERTIFICATE: "{{ certs_dir }}/key.crt"
-      REGISTRY_HTTP_TLS_KEY: "{{ certs_dir }}/key.key"  
+    mounts:
+      - source: /home/node1/Progetto_VCC/vcc-exam-sll-certificate/volumes/config/config.yml
+        target: /etc/docker/registry/config.yml
+        type: bind
 
-#- name: Deploy Registry
-#  community.docker.docker_container:
-#    name: registry
-#    image: distribution/distribution:2.8.1
-#    ports:
-#      - 5001:5001
-#    volumes:
-#      - /data/docker-registry:/var/lib/registry
-#      - /data/certs:/certs
-#    env:
-#      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.pem
-#      REGISTRY_HTTP_TLS_KEY: /certs/domain.key
+      - source: /data/docker-registry
+        target: /docker-registry
+        type: bind
+
+      - source: /data/docker-registry/certs
+        target: /certs
+        type: bind

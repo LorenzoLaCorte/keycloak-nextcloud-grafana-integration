@@ -1,3 +1,7 @@
 ---
 certs_dir: /data/docker-registry/certs
 data_dir: /data/docker-registry
+psw_file: /data/docker-registry/user_psw.txt
+registry_htpasswd_file: /data/docker-registry/htpasswd
+registry_realm: registry_realm
+registry_username: registry_user

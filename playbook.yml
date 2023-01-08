@@ -4,7 +4,6 @@
   become: true
   roles:
   - docker
-  - database
   - keycloak
   - nextcloud
   - monitoring
@@ -18,6 +17,7 @@
     - nfs-server
     - docker_swarm-manager
     - registry
+    - database
   
 - name: NFS client and Swarm worker join
   hosts: nfs-clients
@@ -26,7 +26,7 @@
     - nfs-client
     - docker_swarm-worker
 
-- name: Instructing Docker hosts to trust TLS certificate
+- name: Instructing Docker hosts to trust TLS certificate and Postgres
   hosts: all
   become: true
   roles:

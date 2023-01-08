@@ -1,0 +1,25 @@
+version: 0.1
+log:
+  fields:
+    service: registry
+storage:
+  cache:
+    blobdescriptor: inmemory
+  filesystem:
+    rootdirectory: /docker-registry
+http:
+  addr: :443
+  headers:
+    X-Content-Type-Options: [nosniff]
+  tls:
+    certificate: /certs/fullchain.pem
+    key: /certs/privkey.pem  
+auth:
+  htpasswd:
+    realm: registry_realm
+    path: /docker-registry/htpasswd   
+health:
+  storagedriver:
+    enabled: true
+    interval: 10s
+    threshold: 3

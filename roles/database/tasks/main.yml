@@ -1,1 +1,15 @@
 ---
+- name: Deploy Postgres
+  community.docker.docker_swarm_service:
+    name: postgres
+    image: postgres:15.1
+    #placement:
+    #  constraints:
+    #    - node.role == manager
+    publish:
+      - published_port: 5432
+        target_port: 5432
+    mounts:
+      - source: /data/postgresql
+        target: /var/lib/postgresql/data
+        type: bind

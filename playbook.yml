@@ -36,4 +36,4 @@
   hosts: nfs-clients
   become: true
   roles:
-    - registry-client       
+    - registry-client

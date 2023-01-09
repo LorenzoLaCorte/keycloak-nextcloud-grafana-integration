@@ -18,7 +18,7 @@
         target: /var/lib/postgresql/data
         type: bind
 
-      - source: /home/node1/Progetto_VCC/vcc-exam-sll-certificate/examples/postgres/sql
+      - source: "{{ playbook_dir }}/examples/postgres/sql"
         target: /docker-entrypoint-initdb.d
         type: bind  
     env:

@@ -82,7 +82,7 @@
       - published_port: 5000
         target_port: 443
     mounts:
-      - source: /home/node1/Progetto_VCC/vcc-exam-sll-certificate/volumes/config/config.yml
+      - source: "{{ playbook_dir }}/volumes/config/config.yml"
         target: /etc/docker/registry/config.yml
         type: bind
 

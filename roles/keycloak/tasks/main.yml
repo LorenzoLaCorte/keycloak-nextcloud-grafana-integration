@@ -1,1 +1,19 @@
 ---
+- name: Deploy keycloak instance
+  community.docker.docker_swarm_service:
+    name: keycloak
+    image: quay.io/keycloak/keycloak:20.0.1
+    restart_config:
+      condition: on-failure
+    publish:
+      - published_port: 8080
+        target_port: 8080
+        mode: host
+    env:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: localhost
+      KC_DB: keycloak 
+      KC_DB_URL: jdbc:postgresql://localhost/keycloak 
+      KC_DB_PASSWORD: keycloak 
+      KC_DB_USERNAME: keycloak

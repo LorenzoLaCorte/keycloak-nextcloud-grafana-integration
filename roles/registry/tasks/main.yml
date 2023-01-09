@@ -70,25 +70,7 @@
     password: "{{ item | split(':') | last }}"
     crypt_scheme: bcrypt
   with_items: "{{ hostvars['node1'].file_content['ansible_facts']['psw_to_insert'] }}"
-
-#- name: Create SSL certificate
-#  openssl_certificate:
-#    path: "{{ certs_dir }}/domain.crt"
-#    privatekey_path: "{{ certs_dir }}/domain.key" 
-#    provider: selfsigned
-
-#- name: Create simple self-signed certificate
-#  community.crypto.x509_certificate:
-#    path: "{{ certs_dir }}/key.crt"
-#    privatekey_path: "{{ certs_dir }}/key.key"
-#    provider: selfsigned 
-
-#- name: Create simple self-signed certificate
-#  community.crypto.openssl_csr:
-#    path: "{{ certs_dir }}/domain.crt"
-#    privatekey_path: "{{ certs_dir }}/domain.key"
-#    subject_alt_name: "DNS:myregistry.domain.com"     
-
+     
 - name: Deploy Registry
   community.docker.docker_swarm_service:
     name: registry

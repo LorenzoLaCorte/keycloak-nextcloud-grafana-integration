@@ -79,8 +79,36 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 --> Snapshot Taken: task6
 
 ### Task 7,8,9
+- create 2 roles:
 #### Docker Swarm Manager
+- Init a new swarm with default parameters
+
 #### Docker Swarm Client
+- join to the swarm using hostvars for addresses and token 
+
+### Task 10, 11, 12, 13
+- create 3 roles:
+#### registry
+- it deploys the registry on the server/manager
+  - enabling TLS using certificates under the folder /data/docker-registry/certs
+  - setting up authentication through htpasswd
+    - using bcrypt as scheme (the only one supported)
+    - generating username and password each time randomly
+
+#### registry-tls-common
+- it instructs all single docker hosts to trust TLS certificate copying ca cert inside /etc/docker/certs.d/10.255.255.10:5000
+
+#### registry-client
+- each client logs in leveraging docker_login module
+  - using TLS certificates (insecure registry solved)
+  - using randomly generated username and password
+  
+### Task 14,15,16
+- update database role:
+  - each service has its own db
+  - posttgres DB, user and pass are vcc-test
+  - update the entrypoint in order to call sql scripts and create
+    - DBs keycloak and nextcloud (user and pass use the same name) 
 
 
 ## Facilities available

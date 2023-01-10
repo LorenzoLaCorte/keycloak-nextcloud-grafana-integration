@@ -5,15 +5,15 @@
     image: quay.io/keycloak/keycloak:20.0.1
     restart_config:
       condition: on-failure
-    publish:
-      - published_port: 8080
-        target_port: 8080
-        mode: host
+    networks:
+      - name: host
+    mode: replicated
+    replicas: 1
     env:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HOSTNAME: localhost
-      KC_DB: keycloak 
-      KC_DB_URL: jdbc:postgresql://localhost/keycloak 
+      KC_DB: postgres 
+      KC_DB_URL: jdbc:postgresql://10.255.255.10:5432/keycloak 
       KC_DB_PASSWORD: keycloak 
       KC_DB_USERNAME: keycloak

@@ -15,16 +15,14 @@
     - nfs-server
     - docker_swarm-manager
     - registry
-    - database
-    - keycloak
-    - nextcloud
-  
+    
 - name: NFS client and Swarm worker join
   hosts: nfs-clients
   become: true
   roles:
     - nfs-client
     - docker_swarm-worker
+    
 
 - name: Instructing Docker hosts to trust TLS certificate and Postgres
   hosts: all
@@ -33,7 +31,17 @@
     - registry-tls-common
 
 - name: Registry login
-  hosts: nfs-clients
+  hosts: all
   become: true
   roles:
     - registry-client
+
+- name: Database, Keycloak, Nextcloud and Nextcloud Keycloak Integrator
+  hosts: nfs-servers
+  become: true
+  roles:
+    - database
+    - keycloak
+    - nextcloud
+    - nextcloud-keycloak-integrator
+    

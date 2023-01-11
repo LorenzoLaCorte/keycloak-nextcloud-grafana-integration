@@ -1,7 +1,3 @@
 
-    ID                          NAME              IMAGE                   NODE      DESIRED STATE   CURRENT STATE                      ERROR                                                                                      PORTS
-3w3jvqu4yktav027wepuvo30o   nextcloud.1       nextcloud:23.0-apache   node1     Running         Preparing less than a second ago                                                                                              
-mnisgbwnc4ayia187muqlkq80    \_ nextcloud.1   nextcloud:23.0-apache   node1     Shutdown        Rejected 1 second ago              "invalid mount config for type "bind": bind source path does not exist: /data/nextcloud"   
-lvuthe3ciw5e0wfwjnn5bvp5b    \_ nextcloud.1   nextcloud:23.0-apache   node1     Shutdown        Rejected 3 seconds ago             "invalid mount config for type "bind": bind source path does not exist: /data/nextcloud"   
-p1w4scbdonri65mnc4pqebubd    \_ nextcloud.1   nextcloud:23.0-apache   node1     Shutdown        Rejected 5 seconds ago             "invalid mount config for type "bind": bind source path does not exist: /data/nextcloud"   
-9mrdcmv1n2n1tkqzkkn7sr9dx    \_ nextcloud.1   nextcloud:23.0-apache   node1     Shutdown        Rejected 7 seconds ago             "invalid mount config for type "bind": bind source path does not exist: /data/nextcloud"   
+ID                          NAME         IMAGE                              NODE      DESIRED STATE   CURRENT STATE           ERROR     PORTS
+1tdafjtre9x8ro636a942xp3c   keycloak.1   quay.io/keycloak/keycloak:20.0.1   node2     Shutdownd

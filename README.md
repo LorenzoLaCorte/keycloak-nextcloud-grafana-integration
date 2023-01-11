@@ -110,6 +110,16 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
   - update the entrypoint in order to call sql scripts and create
     - DBs keycloak and nextcloud (user and pass use the same name) 
 
+### Task 17-25
+
+#### keycloack
+
+#### nextcloud
+
+#### nextcloud-keycloak-integrator
+- build the image using the dockerfile inside examples/nextcloud-keycloak-integrator/container
+- push the image inside our registry
+- deploy the service nextcloud-keycloak-integrator
 
 ## Facilities available
 

@@ -5,6 +5,9 @@
     image: quay.io/keycloak/keycloak:20.0.1
     restart_config:
       condition: on-failure
+    placement:
+      constraints:
+        - node.role == manager
     networks:
       - name: host
     mode: replicated

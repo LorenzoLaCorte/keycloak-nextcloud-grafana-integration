@@ -70,20 +70,50 @@ update-venv: venv
 # VCC
 #
 VCC_ROLES := \
-	nfs-client \
-	nfs-server \
+	dashboard \
+	database \
 	docker \
 	docker_swarm-manager \
 	docker_swarm-worker \
+	docker-commn \
+	keycloak \
+	logging \
+	monitoring \
+	nextcloud \
+	nextcloud-keycloak-integrator \
+	nfs-client \
+	nfs-server \
 	registry \
 	registry-client \
-	database \
-	keycloak \
-	nextcloud \
-	monitoring \
-	logging \
-	dashboard
-
+	registry-tls-common
+	
 .PHONY: vcc-roles
 vcc-roles:
 	$(foreach role,$(VCC_ROLES),$(MAKE) add-role ROLE=$(role); )
+
+SERVICES := \
+	keycloak \
+	nextcloud \
+	nextcloud-keycloak-integrator \
+	postgres \
+	registry
+
+.PHONY: clean
+clean: 
+	sudo docker system prune --all && \
+	sudo docker stop $$(sudo docker ps -a -q) && \
+	sudo docker rm -v $$(sudo docker ps -a -q) && \
+	sudo docker service rm $(SERVICES)
+
+.PHONY: log-service
+log-service:
+ifndef SERVICE
+	$(error Please set SERVICE)
+endif
+	sudo docker service ps --no-trunc $(SERVICE) >> logs.txt
+
+.PHONY: docker-services-log
+docker-services-log:
+#	$(foreach service,$(SERVICES),$(MAKE) log-service SERVICE=$(service); )
+	sudo docker service ps --no-trunc $(SERVICES) >> logs.txt && \
+	journalctl -u docker.service | tail -n 50 >> logs.txt

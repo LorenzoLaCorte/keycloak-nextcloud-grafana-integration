@@ -1,3 +1,0 @@
-
-ID                          NAME         IMAGE                              NODE      DESIRED STATE   CURRENT STATE           ERROR     PORTS
-1tdafjtre9x8ro636a942xp3c   keycloak.1   quay.io/keycloak/keycloak:20.0.1   node2     Shutdownd

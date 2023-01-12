@@ -11,6 +11,9 @@
     image: nextcloud:23.0-apache
     restart_config:
       condition: on-failure
+    placement:
+      constraints:
+        - node.role == manager
     networks:
       - name: host
     mode: replicated

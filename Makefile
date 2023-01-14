@@ -102,18 +102,23 @@ SERVICES := \
 clean: 
 	sudo docker system prune --all && \
 	sudo docker stop $$(sudo docker ps -a -q) && \
-	sudo docker rm -v $$(sudo docker ps -a -q) && \
+	sudo docker rm -v -f $$(sudo docker ps -a -q) && \
 	sudo docker service rm $(SERVICES)
 
 .PHONY: log-service
 log-service:
 ifndef SERVICE
-	$(error Please set SERVICE)
+    $(error Please set SERVICE)
 endif
-	sudo docker service ps --no-trunc $(SERVICE) >> logs.txt
+    sudo docker service logs $(SERVICE) >> logs.txt
+
+.PHONY: log-all-services
+log-all-services: 
+    $(foreach service,$(SERVICES),$(MAKE) log-service SERVICE=$(service); )
 
 .PHONY: docker-services-log
-docker-services-log:
+docker-services-log: log-all-services
 #	$(foreach service,$(SERVICES),$(MAKE) log-service SERVICE=$(service); )
+	sudo docker service ls >> logs.txt && \
 	sudo docker service ps --no-trunc $(SERVICES) >> logs.txt && \
 	journalctl -u docker.service | tail -n 50 >> logs.txt

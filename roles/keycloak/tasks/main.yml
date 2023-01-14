@@ -10,6 +10,8 @@
         - node.role == manager
     networks:
       - name: host
+    args:
+      - start-dev
     mode: replicated
     replicas: 1
     env:
@@ -20,3 +22,4 @@
       KC_DB_URL: jdbc:postgresql://10.255.255.10:5432/keycloak 
       KC_DB_PASSWORD: keycloak 
       KC_DB_USERNAME: keycloak
+    

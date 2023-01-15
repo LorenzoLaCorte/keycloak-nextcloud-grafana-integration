@@ -5,7 +5,7 @@ ANSIBLE_ARGS :=
 ANSIBLE_PLAYBOOK := $(CURDIR)/playbook.yml
 VENV_PATH := $(CURDIR)/venv
 VENV_ACTIVATE_PATH := $(VENV_PATH)/bin/activate
-
+STACKNAME = VCC_stack
 #
 # Ansible
 #
@@ -92,33 +92,26 @@ vcc-roles:
 	$(foreach role,$(VCC_ROLES),$(MAKE) add-role ROLE=$(role); )
 
 SERVICES := \
+	registry \
+	VCC_stack_postgres \
 	VCC_stack_keycloak \
 	VCC_stack_nextcloud \
-	VCC_stack_nextcloud-keycloak-integrator \
-	VCC_stack_postgres \
-	registry
+	VCC_stack_nextcloud-keycloak-integrator
 
 .PHONY: clean
 clean: 
 	sudo docker system prune --all && \
+	sudo docker stack rm $(STACKNAME) && \
+	sudo rm -rf /data && \
+	sudo docker service rm $(SERVICES) && \
 	sudo docker stop $$(sudo docker ps -a -q) && \
-	sudo docker rm -v -f $$(sudo docker ps -a -q) && \
-	sudo docker service rm $(SERVICES)
+	sudo docker rm -v -f $$(sudo docker ps -a -q)
 
-#.PHONY: log-service
-#log-service:
-#ifndef SERVICE
-#    $(error Please set SERVICE)
-#endif
-#    sudo docker service logs $(SERVICE) >> logs.txt
-
-#.PHONY: log-all-services
-#log-all-services: 
-#    $(foreach service,$(SERVICES),$(MAKE) log-service SERVICE=$(service);)
-
-.PHONY: docker-services-log
-docker-services-log:
-#	$(foreach service,$(SERVICES),$(MAKE) log-service SERVICE=$(service); )
+.PHONY: logs
+logs:
 	sudo docker service ls > logs.txt && \
 	sudo docker service ps --no-trunc $(SERVICES) >> logs.txt && \
-	journalctl -u docker.service | tail -n 50 >> logs.txt
+	printf "\n\n------------ LOGS ------------\n" >> logs.txt && \
+	for service in $(SERVICES) ; do \
+		sudo docker service logs -f $$service >> logs.txt ; \
+	done

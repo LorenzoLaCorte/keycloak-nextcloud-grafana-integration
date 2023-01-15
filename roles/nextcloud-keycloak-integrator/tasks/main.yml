@@ -6,30 +6,3 @@
     name: 10.255.255.10:5000/nextcloud-keycloak-integrator
     push: true
     source: build
-
-- name: Deploy nextcloud-keycloak-integrator instance
-  community.docker.docker_swarm_service:
-    name: nextcloud-keycloak-integrator
-    image: 10.255.255.10:5000/nextcloud-keycloak-integrator
-    restart_config:
-      condition: on-failure
-    placement:
-      constraints:
-        - node.role == manager
-    networks:
-      - name: host
-    mode: replicated
-    replicas: 1
-    env:
-      NEXTCLOUD_CONTAINER_NAME: nextcloud
-      KEYCLOAK_CONTAINER_NAME: keycloak
-      KEYCLOAK_ADMIN_USER: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      SAMPLE_USER_PASSWORD: itsdifficult
-      OIDC_CLIENT_ID: nextcloud 
-      OIDC_PROVIDER_URL: http://10.255.255.10:8080/realms/vcc
-      OIDC_LOGOUT_URL: http://10.255.255.10/apps/oidc_login/oidc
-    mounts:
-      - source: /var/run/docker.sock
-        target: /var/run/docker.sock
-        type: bind

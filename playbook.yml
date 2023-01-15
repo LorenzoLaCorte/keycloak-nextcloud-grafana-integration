@@ -41,7 +41,7 @@
   become: true
   roles:
     - database
-    - keycloak
     - nextcloud
     - nextcloud-keycloak-integrator
+    - stack
     

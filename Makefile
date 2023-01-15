@@ -92,10 +92,10 @@ vcc-roles:
 	$(foreach role,$(VCC_ROLES),$(MAKE) add-role ROLE=$(role); )
 
 SERVICES := \
-	keycloak \
-	nextcloud \
-	nextcloud-keycloak-integrator \
-	postgres \
+	VCC_stack_keycloak \
+	VCC_stack_nextcloud \
+	VCC_stack_nextcloud-keycloak-integrator \
+	VCC_stack_postgres \
 	registry
 
 .PHONY: clean
@@ -117,8 +117,8 @@ clean:
 #    $(foreach service,$(SERVICES),$(MAKE) log-service SERVICE=$(service);)
 
 .PHONY: docker-services-log
-docker-services-log: log-all-services
+docker-services-log:
 #	$(foreach service,$(SERVICES),$(MAKE) log-service SERVICE=$(service); )
-	sudo docker service ls >> logs.txt && \
+	sudo docker service ls > logs.txt && \
 	sudo docker service ps --no-trunc $(SERVICES) >> logs.txt && \
 	journalctl -u docker.service | tail -n 50 >> logs.txt

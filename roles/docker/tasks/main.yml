@@ -29,3 +29,7 @@
       - docker-registry
     state: latest
     update_cache: true
+
+- name: Install jsondiff
+  ansible.builtin.pip:
+    name: jsondiff    

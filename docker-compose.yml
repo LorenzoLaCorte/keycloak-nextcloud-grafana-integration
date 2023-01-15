@@ -1,0 +1,86 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:15.1
+    environment: 
+      POSTGRES_DB: vcc-test
+      POSTGRES_USER: vcc-test
+      POSTGRES_PASSWORD: vcc-test
+    volumes:
+      - /data/postgresql:/var/lib/postgresql/data
+      - ./examples/postgres/sql:/docker-entrypoint-initdb.d
+    deploy:
+      mode: global
+    ports:
+      - target: 5432
+        published: 5432
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:20.0.1
+    command: start-dev
+    environment: 
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: localhost
+      KC_DB: postgres 
+      KC_DB_URL: jdbc:postgresql://10.255.255.10:5432/keycloak 
+      KC_DB_PASSWORD: keycloak 
+      KC_DB_USERNAME: keycloak
+    ports:
+      - target: 8080
+        published: 8080
+        mode: host
+    deploy:
+      mode: replicated
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  nextcloud:
+    image: nextcloud:23.0-apache
+    environment: 
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: nextcloud
+      POSTGRES_PASSWORD: nextcloud
+      POSTGRES_HOST: 10.255.255.10
+      NEXTCLOUD_ADMIN_USER: admin
+      NEXTCLOUD_ADMIN_PASSWORD: admin
+    volumes:
+      - /data/nextcloud:/var/www/html  
+    ports:
+      - target: 80
+        published: 80
+        mode: host
+    deploy:
+      mode: replicated
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  nextcloud-keycloak-integrator:
+    image: 10.255.255.10:5000/nextcloud-keycloak-integrator
+    environment: 
+      NEXTCLOUD_CONTAINER_NAME: nextcloud
+      KEYCLOAK_CONTAINER_NAME: keycloak
+      KEYCLOAK_ADMIN_USER: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      SAMPLE_USER_PASSWORD: itsdifficult
+      OIDC_CLIENT_ID: nextcloud 
+      OIDC_PROVIDER_URL: http://10.255.255.10:8080/realms/vcc
+      OIDC_LOGOUT_URL: http://10.255.255.10/apps/oidc_login/oidc
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: replicated
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure    

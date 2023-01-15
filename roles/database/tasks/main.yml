@@ -5,23 +5,14 @@
     state: directory
     mode: '0755'
 
-- name: Deploy Postgres
-  community.docker.docker_swarm_service:
-    name: postgres
-    image: postgres:15.1
-    mode: global  # each service has its own db
-    publish:
-      - published_port: 5432
-        target_port: 5432
-    mounts:
-      - source: "{{ postgres_data_dir }}"
-        target: /var/lib/postgresql/data
-        type: bind
+- name: Delete env to allow updates
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/.env"
+    state: absent 
 
-      - source: "{{ playbook_dir }}/examples/postgres/sql"
-        target: /docker-entrypoint-initdb.d
-        type: bind  
-    env:
-      POSTGRES_DB: vcc-test
-      POSTGRES_USER: vcc-test
-      POSTGRES_PASSWORD: vcc-test   
+- name: Update env variables for Compose
+  ansible.builtin.lineinfile:
+    path: "{{ playbook_dir }}/.env"
+    state: present
+    line: "PLAYBOOK_DIR={{ playbook_dir }}"
+    create: yes      

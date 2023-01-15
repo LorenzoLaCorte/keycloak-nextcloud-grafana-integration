@@ -1,0 +1,7 @@
+---
+- name: Deploy stack from a compose file
+  docker_stack:
+    state: present
+    name: VCC_stack
+    compose:
+      - "{{ playbook_dir }}/docker-compose.yml"

@@ -105,16 +105,16 @@ clean:
 	sudo docker rm -v -f $$(sudo docker ps -a -q) && \
 	sudo docker service rm $(SERVICES)
 
-.PHONY: log-service
-log-service:
-ifndef SERVICE
-    $(error Please set SERVICE)
-endif
-    sudo docker service logs $(SERVICE) >> logs.txt
+#.PHONY: log-service
+#log-service:
+#ifndef SERVICE
+#    $(error Please set SERVICE)
+#endif
+#    sudo docker service logs $(SERVICE) >> logs.txt
 
-.PHONY: log-all-services
-log-all-services: 
-    $(foreach service,$(SERVICES),$(MAKE) log-service SERVICE=$(service); )
+#.PHONY: log-all-services
+#log-all-services: 
+#    $(foreach service,$(SERVICES),$(MAKE) log-service SERVICE=$(service);)
 
 .PHONY: docker-services-log
 docker-services-log: log-all-services

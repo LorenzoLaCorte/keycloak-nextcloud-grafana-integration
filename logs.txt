@@ -1,4 +1,5 @@
 ID             NAME                                      MODE         REPLICAS   IMAGE                                                     PORTS
+<<<<<<< HEAD
 e4sjfa7hwk74   VCC_stack_keycloak                        replicated   1/1        quay.io/keycloak/keycloak:20.0.1                          
 fyy0a2faj1k5   VCC_stack_nextcloud                       replicated   1/1        nextcloud:23.0-apache                                     
 jp7ysdhmo75i   VCC_stack_nextcloud-keycloak-integrator   replicated   1/1        10.255.255.10:5000/nextcloud-keycloak-integrator:latest   
@@ -1386,3 +1387,77 @@ VCC_stack_nextcloud-keycloak-integrator.1.9uhyqll65e14@node1    | []
 VCC_stack_nextcloud-keycloak-integrator.1.9uhyqll65e14@node1    | []
 VCC_stack_nextcloud-keycloak-integrator.1.9uhyqll65e14@node1    | []
 VCC_stack_nextcloud-keycloak-integrator.1.9uhyqll65e14@node1    | []
+=======
+6lnjqfu0d70f   VCC_stack_keycloak                        replicated   1/1        quay.io/keycloak/keycloak:20.0.1                          
+u8whxwwqocb8   VCC_stack_nextcloud                       replicated   1/1        nextcloud:23.0-apache                                     
+1smx70dsetmn   VCC_stack_nextcloud-keycloak-integrator   replicated   1/1        10.255.255.10:5000/nextcloud-keycloak-integrator:latest   
+qlf4k2gt2g7s   VCC_stack_postgres                        global       1/1        postgres:15.1                                             *:5432->5432/tcp
+rfki8fysiyl4   VCC_stack_traefik                         replicated   1/1        traefik:v2.9.6                                            *:8080->8080/tcp
+5c606422i18b   registry                                  replicated   1/1        distribution/distribution:2.8.1                           *:5000->443/tcp
+ID                          NAME                                               IMAGE                                                                                                      NODE      DESIRED STATE   CURRENT STATE                     ERROR                                                                                                                                              PORTS
+nnxx2kvegznu4d429pp08ik32   VCC_stack_keycloak.1                               quay.io/keycloak/keycloak:20.0.1@sha256:8830f76112b62231f17b43f115a3deca4de7e4a33eeee298e85cb295c5810e8a   node1     Running         Running 5 minutes ago                                                                                                                                                                
+il2q4hftiohrjp5rqnjwahtrv   VCC_stack_nextcloud-keycloak-integrator.1          10.255.255.10:5000/nextcloud-keycloak-integrator:latest                                                    node1     Running         Running 4 minutes ago                                                                                                                                                                
+9n0jswxwrapdf782a16bdga93   VCC_stack_nextcloud.1                              nextcloud:23.0-apache@sha256:fa7ad48ab0185d2d38bdc412890168fb27771b41e6ba9fc8dafda569129d946d              node1     Running         Running 4 minutes ago                                                                                                                                                                
+oj7hlozbmakwiaupoantd2e0f   VCC_stack_postgres.jbzifu25i9ph1fk3fr6l97y05       postgres:15.1@sha256:6b07fc4fbcf551ea4546093e90cecefc9dc60d7ea8c56a4ace704940b6d6b7a3                      node2     Ready           Rejected less than a second ago   "invalid mount config for type "bind": bind source path does not exist: /home/node1/Progetto_VCC/vcc-exam-sll-certificate/examples/postgres/sql"   
+7k8bom3py14llp24pub78i6oe    \_ VCC_stack_postgres.jbzifu25i9ph1fk3fr6l97y05   postgres:15.1@sha256:6b07fc4fbcf551ea4546093e90cecefc9dc60d7ea8c56a4ace704940b6d6b7a3                      node2     Shutdown        Rejected 5 seconds ago            "invalid mount config for type "bind": bind source path does not exist: /home/node1/Progetto_VCC/vcc-exam-sll-certificate/examples/postgres/sql"   
+d5pgejew6yrsdcitqx8lthi31    \_ VCC_stack_postgres.jbzifu25i9ph1fk3fr6l97y05   postgres:15.1@sha256:6b07fc4fbcf551ea4546093e90cecefc9dc60d7ea8c56a4ace704940b6d6b7a3                      node2     Shutdown        Rejected 10 seconds ago           "invalid mount config for type "bind": bind source path does not exist: /home/node1/Progetto_VCC/vcc-exam-sll-certificate/examples/postgres/sql"   
+ouas44of390v1fx6naaqi9uuj    \_ VCC_stack_postgres.jbzifu25i9ph1fk3fr6l97y05   postgres:15.1@sha256:6b07fc4fbcf551ea4546093e90cecefc9dc60d7ea8c56a4ace704940b6d6b7a3                      node2     Shutdown        Rejected 15 seconds ago           "invalid mount config for type "bind": bind source path does not exist: /home/node1/Progetto_VCC/vcc-exam-sll-certificate/examples/postgres/sql"   
+fzcryov0ddoxgav4glammk72g    \_ VCC_stack_postgres.jbzifu25i9ph1fk3fr6l97y05   postgres:15.1@sha256:6b07fc4fbcf551ea4546093e90cecefc9dc60d7ea8c56a4ace704940b6d6b7a3                      node2     Shutdown        Rejected 20 seconds ago           "invalid mount config for type "bind": bind source path does not exist: /home/node1/Progetto_VCC/vcc-exam-sll-certificate/examples/postgres/sql"   
+yh589jgswkuehsvf51s1c0qxs   VCC_stack_postgres.sdkwm8pwc0ms7iom34yw33qi5       postgres:15.1@sha256:6b07fc4fbcf551ea4546093e90cecefc9dc60d7ea8c56a4ace704940b6d6b7a3                      node1     Running         Running 4 minutes ago                                                                                                                                                                
+xrbh6zruuy4uq78kgf3eqpzam   VCC_stack_traefik.1                                traefik:v2.9.6@sha256:bb7be8d50edf73d8d3a812ac8873ef354a0fe9b40d7f3880747b43a3525855d2                     node1     Running         Running 4 minutes ago                                                                                                                                                                *:443->443/tcp,*:443->443/tcp,*:80->80/tcp,*:80->80/tcp
+9rl3pnwq3y3lscvnnvm6ghqxp   registry.1                                         distribution/distribution:2.8.1                                                                            node1     Running         Running 6 minutes ago                                                                                                                                                                
+wl9kptx9fw61rkaaje3pi23yh    \_ registry.1                                     distribution/distribution:2.8.1                                                                            node1     Shutdown        Failed 6 minutes ago              "task: non-zero exit (2)"                                                                                                                          
+n3wx4okexbeekenshbjhkqhk4    \_ registry.1                                     distribution/distribution:2.8.1                                                                            node1     Shutdown        Failed 24 minutes ago             "task: non-zero exit (2)"                                                                                                                          
+tpz99vavprqq37fu8esigonsr    \_ registry.1                                     distribution/distribution:2.8.1                                                                            node1     Shutdown        Failed 24 minutes ago             "task: non-zero exit (2)"                                                                                                                          
+p5pml3auuszpqkal8zn9zjcz8    \_ registry.1                                     distribution/distribution:2.8.1                                                                            node1     Shutdown        Failed 24 minutes ago             "task: non-zero exit (2)"                                                                                                                          
+Jan 16 19:53:34 node1 dockerd[23489]: time="2023-01-16T19:53:34.994470058Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:35 node1 dockerd[23489]: time="2023-01-16T19:53:35.002922578Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:36 node1 dockerd[23489]: time="2023-01-16T19:53:36.143940933Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:36 node1 dockerd[23489]: time="2023-01-16T19:53:36.148396672Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:36 node1 dockerd[23489]: time="2023-01-16T19:53:36.150808374Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:37 node1 dockerd[23489]: time="2023-01-16T19:53:37.268624070Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:37 node1 dockerd[23489]: time="2023-01-16T19:53:37.272932801Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:37 node1 dockerd[23489]: time="2023-01-16T19:53:37.277940608Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:38 node1 dockerd[23489]: time="2023-01-16T19:53:38.389094028Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:38 node1 dockerd[23489]: time="2023-01-16T19:53:38.392650502Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:38 node1 dockerd[23489]: time="2023-01-16T19:53:38.397029535Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:39 node1 dockerd[23489]: time="2023-01-16T19:53:39.522667763Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:39 node1 dockerd[23489]: time="2023-01-16T19:53:39.526039380Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:39 node1 dockerd[23489]: time="2023-01-16T19:53:39.528715545Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:40 node1 dockerd[23489]: time="2023-01-16T19:53:40.646338043Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:40 node1 dockerd[23489]: time="2023-01-16T19:53:40.650502239Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:40 node1 dockerd[23489]: time="2023-01-16T19:53:40.653442342Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:41 node1 dockerd[23489]: time="2023-01-16T19:53:41.771918322Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:41 node1 dockerd[23489]: time="2023-01-16T19:53:41.775155417Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:41 node1 dockerd[23489]: time="2023-01-16T19:53:41.779162608Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:42 node1 dockerd[23489]: time="2023-01-16T19:53:42.871470614Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:42 node1 dockerd[23489]: time="2023-01-16T19:53:42.875415038Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:42 node1 dockerd[23489]: time="2023-01-16T19:53:42.878420371Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:44 node1 dockerd[23489]: time="2023-01-16T19:53:44.108950007Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:44 node1 dockerd[23489]: time="2023-01-16T19:53:44.120571949Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:44 node1 dockerd[23489]: time="2023-01-16T19:53:44.127073687Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:45 node1 dockerd[23489]: time="2023-01-16T19:53:45.301376416Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:45 node1 dockerd[23489]: time="2023-01-16T19:53:45.306456233Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:45 node1 dockerd[23489]: time="2023-01-16T19:53:45.314460019Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:46 node1 dockerd[23489]: time="2023-01-16T19:53:46.460887679Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:46 node1 dockerd[23489]: time="2023-01-16T19:53:46.465716474Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:46 node1 dockerd[23489]: time="2023-01-16T19:53:46.470795558Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:47 node1 dockerd[23489]: time="2023-01-16T19:53:47.613478872Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:47 node1 dockerd[23489]: time="2023-01-16T19:53:47.617669317Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:47 node1 dockerd[23489]: time="2023-01-16T19:53:47.621357597Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:48 node1 dockerd[23489]: time="2023-01-16T19:53:48.725941597Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:48 node1 dockerd[23489]: time="2023-01-16T19:53:48.730714624Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:48 node1 dockerd[23489]: time="2023-01-16T19:53:48.734607067Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:49 node1 dockerd[23489]: time="2023-01-16T19:53:49.904083339Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:49 node1 dockerd[23489]: time="2023-01-16T19:53:49.907867825Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:49 node1 dockerd[23489]: time="2023-01-16T19:53:49.910912884Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:51 node1 dockerd[23489]: time="2023-01-16T19:53:51.022721564Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:51 node1 dockerd[23489]: time="2023-01-16T19:53:51.028605236Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:51 node1 dockerd[23489]: time="2023-01-16T19:53:51.032475792Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:52 node1 dockerd[23489]: time="2023-01-16T19:53:52.178226059Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:52 node1 dockerd[23489]: time="2023-01-16T19:53:52.187388732Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:52 node1 dockerd[23489]: time="2023-01-16T19:53:52.191264812Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+Jan 16 19:53:53 node1 dockerd[23489]: time="2023-01-16T19:53:53.278185074Z" level=error msg="Error getting service nextcloud: service nextcloud not found"
+Jan 16 19:53:53 node1 dockerd[23489]: time="2023-01-16T19:53:53.281508650Z" level=error msg="Error getting task nextcloud: task nextcloud not found"
+Jan 16 19:53:53 node1 dockerd[23489]: time="2023-01-16T19:53:53.284234193Z" level=error msg="Error getting node nextcloud: node nextcloud not found"
+>>>>>>> ComposeStackNew

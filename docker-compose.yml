@@ -26,10 +26,12 @@ services:
       KC_DB_URL: jdbc:postgresql://10.255.255.10:5432/keycloak 
       KC_DB_PASSWORD: keycloak 
       KC_DB_USERNAME: keycloak
-    ports:
-      - target: 8080
-        published: 8080
-        mode: host
+    depends_on:
+      - postgres
+    #ports:
+    #  - target: 8080
+    #    published: 8080
+    #    mode: host
     deploy:
       mode: replicated
       placement:
@@ -38,6 +40,16 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=host"
+        - "traefik.http.routers.keycloak_route.entrypoints=websecure"
+        - "traefik.http.routers.keycloak_route.rule=Host('auth.localdomain')"
+        - "traefik.http.routers.keycloak_route.service=VCC_stack_keycloak"
+        - "traefik.http.routers.keycloak_route.tls=true"
+        - "traefik.http.routers.keycloak_route.middlewares=keycloak_proto"
+        - "traefik.http.services.VCC_stack_keycloak.loadbalancer.server.port=8080"
+        - "traefik.http.middlewares.keycloak_proto.headers.customrequestheaders.X-Forwarded-Proto=https"
 
   nextcloud:
     image: nextcloud:23.0-apache
@@ -49,11 +61,48 @@ services:
       NEXTCLOUD_ADMIN_USER: admin
       NEXTCLOUD_ADMIN_PASSWORD: admin
     volumes:
-      - /data/nextcloud:/var/www/html  
-    ports:
-      - target: 80
-        published: 80
-        mode: host
+      - /data/nextcloud:/var/www/html
+    depends_on:
+      - postgres 
+    #ports:
+    #  - target: 80
+    #    published: 80
+    #    mode: host
+    deploy:
+      mode: replicated
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=host"
+        - "traefik.http.routers.nextcloud_route.entrypoints=websecure"
+        - "traefik.http.routers.nextcloud_route.rule=Host('cloud.localdomain')"
+        - "traefik.http.routers.nextcloud_route.service=VCC_stack_nextcloud"
+        - "traefik.http.routers.nextcloud_route.tls=true"
+        - "traefik.http.routers.nextcloud_route.middlewares=nextcloud_proto"
+        - "traefik.http.services.VCC_stack_nextcloud.loadbalancer.server.port=80"
+        - "traefik.http.middlewares.nextcloud_proto.headers.customrequestheaders.X-Forwarded-Proto=https"  
+
+  nextcloud-keycloak-integrator:
+    image: 10.255.255.10:5000/nextcloud-keycloak-integrator
+    environment: 
+      NEXTCLOUD_CONTAINER_NAME: VCC_stack_nextcloud
+      KEYCLOAK_CONTAINER_NAME: VCC_stack_keycloak
+      KEYCLOAK_ADMIN_USER: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      SAMPLE_USER_PASSWORD: itsdifficult
+      OIDC_CLIENT_ID: nextcloud 
+      OIDC_PROVIDER_URL: http://10.255.255.10:8080/realms/vcc
+      OIDC_LOGOUT_URL: http://10.255.255.10/apps/oidc_login/oidc
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - keycloak
+      - nextcloud 
     deploy:
       mode: replicated
       placement:
@@ -63,24 +112,47 @@ services:
       restart_policy:
         condition: on-failure
 
-  nextcloud-keycloak-integrator:
-    image: 10.255.255.10:5000/nextcloud-keycloak-integrator
-    environment: 
-      NEXTCLOUD_CONTAINER_NAME: nextcloud
-      KEYCLOAK_CONTAINER_NAME: keycloak
-      KEYCLOAK_ADMIN_USER: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      SAMPLE_USER_PASSWORD: itsdifficult
-      OIDC_CLIENT_ID: nextcloud 
-      OIDC_PROVIDER_URL: http://10.255.255.10:8080/realms/vcc
-      OIDC_LOGOUT_URL: http://10.255.255.10/apps/oidc_login/oidc
+  traefik:
+    image: traefik:v2.9.6
+    hostname: traefik
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /data/docker-registry/certs:/etc/ssl/traefik
+      - /data/traefik/certs-traefik.yml:/etc/traefik/dynamic/certs-traefik.yml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      # HTTP port
+      - target: 80
+        published: 80
+        mode: host
+      - target: 443
+        published: 443
+        mode: host
+      #  Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+    command:
+      # enable Web UI
+      - --api.insecure=true
+      # set provider (Docker Swarm)
+      - --providers.docker
+      - --providers.docker.swarmMode=true
+      # traefik http entrypoint port
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      # redirect
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      # add x-forwaded-for
+      - --entrypoints.web.forwardedHeaders.insecure=true
+      # manually enable services exposed by traefik
+      - --providers.docker.exposedByDefault=false
+      # dynamic configuration files folder
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --log.level=DEBUG
+      # log
+      - "--accesslog=true"
+      - "--accesslog.filePath=/logs/access.log"
     deploy:
       mode: replicated
+      replicas: 1
       placement:
         constraints:
-          - "node.role==manager"
-      replicas: 1
-      restart_policy:
-        condition: on-failure    
+          - node.role == manager    

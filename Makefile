@@ -96,6 +96,7 @@ SERVICES := \
 	VCC_stack_nextcloud \
 	VCC_stack_nextcloud-keycloak-integrator \
 	VCC_stack_postgres \
+	VCC_stack_traefik \
 	registry
 
 .PHONY: clean

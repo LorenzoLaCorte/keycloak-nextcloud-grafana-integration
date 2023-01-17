@@ -36,6 +36,12 @@
   roles:
     - registry-client
 
+- name: Traefik setup
+  hosts: nfs-servers
+  become: true
+  roles:
+    - traefik
+
 - name: Database, Keycloak, Nextcloud and Nextcloud Keycloak Integrator
   hosts: nfs-servers
   become: true

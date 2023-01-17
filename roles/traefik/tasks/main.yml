@@ -1,0 +1,24 @@
+---
+- name: Registering domain names
+  ansible.builtin.lineinfile:
+    path: "/etc/hosts"
+    state: present
+    line: "{{ item[1] }} {{ item[0] }}"
+    create: yes
+  with_nested:
+    - ["cloud.localdomain", "auth.localdomain", "mon.localdomain"]
+    - ["{{ hostvars['node1']['ansible_host'] }}"]
+
+- name: Create traefik certificate setup
+  copy:
+    dest: /data/traefik/certs-traefik.yml   
+    content: |
+      tls:
+        stores:
+          default:
+            defaultCertificate:
+              certFile: /etc/ssl/traefik/fullchain.pem
+              keyFile: /etc/ssl/traefik/privkey.pem
+        certificates:
+          - certFile: /etc/ssl/traefik/fullchain.pem
+            keyFile: /etc/ssl/traefik/privkey.pem

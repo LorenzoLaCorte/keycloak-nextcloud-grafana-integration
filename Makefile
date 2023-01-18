@@ -96,22 +96,23 @@ SERVICES := \
 	VCC_stack_postgres \
 	VCC_stack_keycloak \
 	VCC_stack_nextcloud \
-	VCC_stack_nextcloud-keycloak-integrator
+	VCC_stack_nextcloud-keycloak-integrator \
+	VCC_stack_traefik \
+	VCC_stack_reverse-proxy-https-init
 
 .PHONY: clean
 clean: 
-	sudo docker system prune --all && \
+#	sudo docker system prune --all
 	sudo docker stack rm $(STACKNAME) && \
-	sudo rm -rf /data && \
-	sudo docker service rm $(SERVICES) && \
-	sudo docker stop $$(sudo docker ps -a -q) && \
-	sudo docker rm -v -f $$(sudo docker ps -a -q)
+	sudo rm -r /data/traefik/logs/traefik.log
 
 .PHONY: logs
 logs:
 	sudo docker service ls > logs.txt && \
 	sudo docker service ps --no-trunc $(SERVICES) >> logs.txt && \
 	printf "\n\n------------ LOGS ------------\n" >> logs.txt && \
-	for service in $(SERVICES) ; do \
-		sudo docker service logs -f $$service >> logs.txt ; \
-	done
+	cat /data/traefik/logs/traefik.log >> logs.txt
+#	for service in $(SERVICES) ; do \
+#		sudo docker service logs -f $$service >> logs.txt ; \
+#	done
+	

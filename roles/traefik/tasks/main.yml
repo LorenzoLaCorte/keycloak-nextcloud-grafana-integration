@@ -9,16 +9,19 @@
     - ["cloud.localdomain", "auth.localdomain", "mon.localdomain"]
     - ["{{ hostvars['node1']['ansible_host'] }}"]
 
-- name: Create traefik certificate setup
-  copy:
-    dest: /data/traefik/certs-traefik.yml   
-    content: |
-      tls:
-        stores:
-          default:
-            defaultCertificate:
-              certFile: /etc/ssl/traefik/fullchain.pem
-              keyFile: /etc/ssl/traefik/privkey.pem
-        certificates:
-          - certFile: /etc/ssl/traefik/fullchain.pem
-            keyFile: /etc/ssl/traefik/privkey.pem
+- name: Create directories needed by Traefik if they do not exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  with_items:
+    - /data/certs
+    - /data/traefik/logs     
+
+- name: Build reverse proxy image
+  community.docker.docker_image:
+    build:
+      path: "{{playbook_dir}}/volumes/ssl-init"
+    name: 10.255.255.10:5000/rev-proxy
+    push: true
+    source: build

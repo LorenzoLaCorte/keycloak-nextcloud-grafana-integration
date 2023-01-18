@@ -8,7 +8,7 @@ storage:
   filesystem:
     rootdirectory: /docker-registry
 http:
-  addr: :443
+  addr: :5000
   headers:
     X-Content-Type-Options: [nosniff]
   tls:

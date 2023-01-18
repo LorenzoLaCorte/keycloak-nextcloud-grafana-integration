@@ -29,8 +29,8 @@ services:
     depends_on:
       - postgres
     #ports:
-    #  - target: 8080
-    #    published: 8080
+    #  - target: 591
+    #    published: 591
     #    mode: host
     deploy:
       mode: replicated
@@ -42,9 +42,10 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
-        - "traefik.docker.network=host"
+        - "traefik.docker.network=VCC_stack_default"
         - "traefik.http.routers.keycloak_route.entrypoints=websecure"
-        - "traefik.http.routers.keycloak_route.rule=Host('auth.localdomain')"
+        - "traefik.http.routers.keycloak_route.rule=Host(`auth.localdomain`)"
+        - "traefik.http.routers.keycloak_route.tls.domains=[main: `auth.localdomain`]"
         - "traefik.http.routers.keycloak_route.service=VCC_stack_keycloak"
         - "traefik.http.routers.keycloak_route.tls=true"
         - "traefik.http.routers.keycloak_route.middlewares=keycloak_proto"
@@ -65,8 +66,8 @@ services:
     depends_on:
       - postgres 
     #ports:
-    #  - target: 80
-    #    published: 80
+    #  - target: 8008
+    #    published: 8008
     #    mode: host
     deploy:
       mode: replicated
@@ -78,9 +79,10 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
-        - "traefik.docker.network=host"
+        - "traefik.docker.network=VCC_stack_default"
         - "traefik.http.routers.nextcloud_route.entrypoints=websecure"
-        - "traefik.http.routers.nextcloud_route.rule=Host('cloud.localdomain')"
+        - "traefik.http.routers.nextcloud_route.rule=Host(`cloud.localdomain`)"
+        - "traefik.http.routers.nextcloud_route.tls.domains=[main: `cloud.localdomain`]"
         - "traefik.http.routers.nextcloud_route.service=VCC_stack_nextcloud"
         - "traefik.http.routers.nextcloud_route.tls=true"
         - "traefik.http.routers.nextcloud_route.middlewares=nextcloud_proto"
@@ -112,12 +114,32 @@ services:
       restart_policy:
         condition: on-failure
 
+  reverse-proxy-https-init:
+    image: 10.255.255.10:5000/rev-proxy
+    environment: 
+     SSL_CN: "*.local"
+     SSL_O: "VCC"
+     SSL_C: "IT"
+     SSL_DAYS: 3650
+    volumes:
+      - /data/certs:/etc/ssl/traefik
+      - /data/traefik:/etc/traefik/dynamic
+    deploy:
+      restart_policy:
+        condition: none
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
   traefik:
     image: traefik:v2.9.6
     hostname: traefik
     volumes:
-      - /data/docker-registry/certs:/etc/ssl/traefik
-      - /data/traefik/certs-traefik.yml:/etc/traefik/dynamic/certs-traefik.yml
+      - /data/certs:/etc/ssl/traefik
+      - /data/traefik:/etc/traefik/dynamic
+      - /data/traefik/logs:/logs
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       # HTTP port
@@ -129,6 +151,9 @@ services:
         mode: host
       #  Web UI (enabled by --api.insecure=true)
       - "8080:8080"
+    depends_on:
+      - reverse-proxy-https-init
+      - nextcloud-keycloak-integrator  
     command:
       # enable Web UI
       - --api.insecure=true
@@ -148,8 +173,10 @@ services:
       - --providers.file.directory=/etc/traefik/dynamic
       - --log.level=DEBUG
       # log
-      - "--accesslog=true"
-      - "--accesslog.filePath=/logs/access.log"
+      - --accesslog=true
+      - --accesslog.filePath="/logs/access.log"
+      - "--log.filePath=/logs/traefik.log"
+      # - --traefiklog.filePath="/logs/traefik.log"
     deploy:
       mode: replicated
       replicas: 1

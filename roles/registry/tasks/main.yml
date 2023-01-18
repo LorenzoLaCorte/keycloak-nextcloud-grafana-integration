@@ -80,7 +80,7 @@
         - node.role == manager
     publish:
       - published_port: 5000
-        target_port: 443
+        target_port: 5000
     mounts:
       - source: "{{ playbook_dir }}/volumes/config/config.yml"
         target: /etc/docker/registry/config.yml

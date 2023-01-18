@@ -15,4 +15,4 @@
     path: "{{ playbook_dir }}/.env"
     state: present
     line: "PLAYBOOK_DIR={{ playbook_dir }}"
-    create: yes      
+    create: yes

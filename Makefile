@@ -115,4 +115,3 @@ logs:
 #	for service in $(SERVICES) ; do \
 #		sudo docker service logs -f $$service >> logs.txt ; \
 #	done
-	

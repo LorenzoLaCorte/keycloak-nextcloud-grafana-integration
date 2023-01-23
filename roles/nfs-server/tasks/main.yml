@@ -4,6 +4,8 @@
   ansible.builtin.file: # creates directory if it doesn't exist
     path: "{{ nfs_share_path }}"
     state: directory
+    recurse: true
+    mode: '1777'
 
 - name: Install NFS server
   ansible.builtin.apt:  # install something

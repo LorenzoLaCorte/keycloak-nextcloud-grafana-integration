@@ -7,8 +7,8 @@ services:
       POSTGRES_USER: vcc-test
       POSTGRES_PASSWORD: vcc-test
     volumes:
-      - /data/postgresql:/var/lib/postgresql/data
-      - ./examples/postgres/sql:/docker-entrypoint-initdb.d
+      - /data/postgresql/data_dir:/var/lib/postgresql/data
+      - /data/postgresql/sql:/docker-entrypoint-initdb.d
     deploy:
       mode: global
     ports:
@@ -45,12 +45,12 @@ services:
         - "traefik.docker.network=VCC_stack_default"
         - "traefik.http.routers.keycloak_route.entrypoints=websecure"
         - "traefik.http.routers.keycloak_route.rule=Host(`auth.localdomain`)"
-        - "traefik.http.routers.keycloak_route.tls.domains=[main: `auth.localdomain`]"
         - "traefik.http.routers.keycloak_route.service=VCC_stack_keycloak"
-        - "traefik.http.routers.keycloak_route.tls=true"
-        - "traefik.http.routers.keycloak_route.middlewares=keycloak_proto"
+        #- "traefik.http.routers.keycloak_route.tls=true"
+        #- "traefik.http.routers.keycloak_route.middlewares=keycloak_proto"
         - "traefik.http.services.VCC_stack_keycloak.loadbalancer.server.port=8080"
-        - "traefik.http.middlewares.keycloak_proto.headers.customrequestheaders.X-Forwarded-Proto=https"
+        - "traefik.http.services.VCC_stack_keycloak.loadbalancer.server.scheme=https"
+        #- "traefik.http.middlewares.keycloak_proto.headers.customrequestheaders.X-Forwarded-Proto=https"
 
   nextcloud:
     image: nextcloud:23.0-apache
@@ -82,12 +82,12 @@ services:
         - "traefik.docker.network=VCC_stack_default"
         - "traefik.http.routers.nextcloud_route.entrypoints=websecure"
         - "traefik.http.routers.nextcloud_route.rule=Host(`cloud.localdomain`)"
-        - "traefik.http.routers.nextcloud_route.tls.domains=[main: `cloud.localdomain`]"
         - "traefik.http.routers.nextcloud_route.service=VCC_stack_nextcloud"
-        - "traefik.http.routers.nextcloud_route.tls=true"
-        - "traefik.http.routers.nextcloud_route.middlewares=nextcloud_proto"
+        #- "traefik.http.routers.nextcloud_route.tls=true"
+        #- "traefik.http.routers.nextcloud_route.middlewares=nextcloud_proto"
         - "traefik.http.services.VCC_stack_nextcloud.loadbalancer.server.port=80"
-        - "traefik.http.middlewares.nextcloud_proto.headers.customrequestheaders.X-Forwarded-Proto=https"  
+        - "traefik.http.services.VCC_stack_nextcloud.loadbalancer.server.scheme=https"
+        #- "traefik.http.middlewares.nextcloud_proto.headers.customrequestheaders.X-Forwarded-Proto=https"  
 
   nextcloud-keycloak-integrator:
     image: 10.255.255.10:5000/nextcloud-keycloak-integrator
@@ -176,6 +176,7 @@ services:
       - --accesslog=true
       - --accesslog.filePath="/logs/access.log"
       - "--log.filePath=/logs/traefik.log"
+      - --serverstransport.insecureskipverify=true
       # - --traefiklog.filePath="/logs/traefik.log"
     deploy:
       mode: replicated
@@ -189,4 +190,4 @@ services:
 networks:
   net:
     name: VCC_stack_default
-    external: true
+#    external: true

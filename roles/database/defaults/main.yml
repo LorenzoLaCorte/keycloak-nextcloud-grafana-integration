@@ -1,2 +1,3 @@
 ---
-postgres_data_dir: /data/postgresql
+postgres_data_dir: /data/postgresql/data_dir
+postgres_scripts_dir: /data/postgresql/sql

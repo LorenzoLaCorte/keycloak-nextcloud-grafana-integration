@@ -9,15 +9,28 @@ services:
     volumes:
       - /data/postgresql/data_dir:/var/lib/postgresql/data
       - /data/postgresql/sql:/docker-entrypoint-initdb.d
+    #networks:
+    #  - traefik-public
     deploy:
-      mode: global
+      mode: replicated
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
     ports:
       - target: 5432
         published: 5432
+        mode: host
 
   keycloak:
     image: quay.io/keycloak/keycloak:20.0.1
-    command: start-dev
+    command: 
+      - start-dev
+      - --log-level=debug
+      - --log=console,file
+      - --log-file=/logs/keycloak.log
     environment: 
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
@@ -28,10 +41,16 @@ services:
       KC_DB_USERNAME: keycloak
     depends_on:
       - postgres
+    volumes:
+      - ./keycloak.log:/logs/keycloak.log 
+    #ports:
+    #  - "8081:8080"  
     #ports:
     #  - target: 591
     #    published: 591
     #    mode: host
+    #networks:
+    #  - traefik-public
     deploy:
       mode: replicated
       placement:
@@ -42,15 +61,20 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
+        # Change the host url here
+        - "traefik.http.routers.keycloak.rule=Host(`auth.localdomain`)"
+        - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+        #- "traefik.http.routers.nextcloud.middlewares=auth"
+        - "traefik.http.routers.keycloak.entrypoints=web"
         - "traefik.docker.network=VCC_stack_default"
-        - "traefik.http.routers.keycloak_route.entrypoints=websecure"
-        - "traefik.http.routers.keycloak_route.rule=Host(`auth.localdomain`)"
-        - "traefik.http.routers.keycloak_route.service=VCC_stack_keycloak"
-        #- "traefik.http.routers.keycloak_route.tls=true"
-        #- "traefik.http.routers.keycloak_route.middlewares=keycloak_proto"
-        - "traefik.http.services.VCC_stack_keycloak.loadbalancer.server.port=8080"
-        - "traefik.http.services.VCC_stack_keycloak.loadbalancer.server.scheme=https"
-        #- "traefik.http.middlewares.keycloak_proto.headers.customrequestheaders.X-Forwarded-Proto=https"
+        - traefik.http.services.keycloak.loadbalancer.sticky=true
+        - traefik.http.services.keycloak.loadbalancer.sticky.cookie.name=KeycloakCookie
+        #- "traefik.http.routers.keycloak.tls=true"
+        #- "traefik.http.routers.keycloak.tls.certresolver=leresolver"
+        #- "traefik.http.routers.nextcloud_route.tls=true"
+        #- "traefik.http.routers.keycloak.middlewares=keycloak_proto"
+        #- "traefik.http.services.VCC_stack_nextcloud.loadbalancer.server.port=8081"
+        #- "traefik.http.middlewares.keycloak_proto.headers.customrequestheaders.X-Forwarded-Proto=https"   
 
   nextcloud:
     image: nextcloud:23.0-apache
@@ -63,12 +87,17 @@ services:
       NEXTCLOUD_ADMIN_PASSWORD: admin
     volumes:
       - /data/nextcloud:/var/www/html
+      - ./nextcloud.log:/var/www/nextcloud/data/nextcloud.log
     depends_on:
       - postgres 
+    #ports:
+    #  - 6081:80 
     #ports:
     #  - target: 8008
     #    published: 8008
     #    mode: host
+    #networks:
+    #  - traefik-public
     deploy:
       mode: replicated
       placement:
@@ -79,15 +108,21 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
+        # Change the host url here
+        - "traefik.http.routers.nextcloud.rule=Host(`cloud.localdomain`)"
+        - "traefik.http.services.nextcloud.loadbalancer.server.port=80"
+        #- "traefik.port=8080"
+        #- "traefik.http.routers.nextcloud.middlewares=auth"
+        - "traefik.http.routers.nextcloud.entrypoints=web"
         - "traefik.docker.network=VCC_stack_default"
-        - "traefik.http.routers.nextcloud_route.entrypoints=websecure"
-        - "traefik.http.routers.nextcloud_route.rule=Host(`cloud.localdomain`)"
-        - "traefik.http.routers.nextcloud_route.service=VCC_stack_nextcloud"
+        - traefik.http.services.nextcloud.loadbalancer.sticky=true
+        - traefik.http.services.nextcloud.loadbalancer.sticky.cookie.name=NextcloudCookie
+        #- "traefik.http.routers.nextcloud.tls=true"
+        #- "traefik.http.routers.nextcloud.tls.certresolver=leresolver"
         #- "traefik.http.routers.nextcloud_route.tls=true"
-        #- "traefik.http.routers.nextcloud_route.middlewares=nextcloud_proto"
-        - "traefik.http.services.VCC_stack_nextcloud.loadbalancer.server.port=80"
-        - "traefik.http.services.VCC_stack_nextcloud.loadbalancer.server.scheme=https"
-        #- "traefik.http.middlewares.nextcloud_proto.headers.customrequestheaders.X-Forwarded-Proto=https"  
+        #- "traefik.http.routers.nextcloud.middlewares=nextcloud_proto"
+        #- "traefik.http.services.VCC_stack_nextcloud.loadbalancer.server.port=8081"
+        #- "traefik.http.middlewares.nextcloud_proto.headers.customrequestheaders.X-Forwarded-Proto=https" 
 
   nextcloud-keycloak-integrator:
     image: 10.255.255.10:5000/nextcloud-keycloak-integrator
@@ -131,7 +166,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.role == manager
+          - node.role == manager      
 
   traefik:
     image: traefik:v2.9.6
@@ -141,53 +176,56 @@ services:
       - /data/traefik:/etc/traefik/dynamic
       - /data/traefik/logs:/logs
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      # - /data/traefik/acme.json:/le/acme.json
+      # - ./volumes/traefik-config/config.yml:/etc/traefik/traefik.yml
+    #networks:
+    #  - traefik-public
     ports:
       # HTTP port
-      - target: 80
-        published: 80
-        mode: host
-      - target: 443
-        published: 443
-        mode: host
+      #- target: 80
+      #  published: 80
+      #  mode: host
+      #- target: 443
+      #  published: 443
+      #  mode: host
+      - 80:80
+      - 6880:8080
       #  Web UI (enabled by --api.insecure=true)
-      - "8080:8080"
     depends_on:
       - reverse-proxy-https-init
       - nextcloud-keycloak-integrator  
     command:
-      # enable Web UI
+    # enable Web UI
       - --api.insecure=true
       # set provider (Docker Swarm)
       - --providers.docker
       - --providers.docker.swarmMode=true
+      - --providers.docker.network=VCC_stack_default
       # traefik http entrypoint port
       - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      # redirect
-      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      #- --entrypoints.websecure.address=:443
+      #- --entrypoints.web.http.redirections.entryPoint.to=websecure
       # add x-forwaded-for
-      - --entrypoints.web.forwardedHeaders.insecure=true
+      #- --entrypoints.web.forwardedHeaders.insecure=true
       # manually enable services exposed by traefik
       - --providers.docker.exposedByDefault=false
-      # dynamic configuration files folder
-      - --providers.file.directory=/etc/traefik/dynamic
-      - --log.level=DEBUG
-      # log
-      - --accesslog=true
-      - --accesslog.filePath="/logs/access.log"
+      #- --certificatesresolvers.leresolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
+      #- --certificatesresolvers.leresolver.acme.email=simoaqui2000@gmail.com
+      # Make sure the this file is available and permission is set correctly
+      #- --certificatesresolvers.leresolver.acme.storage=/le/acme.json
+      #- --certificatesresolvers.leresolver.acme.tlsChallenge=true
       - "--log.filePath=/logs/traefik.log"
-      - --serverstransport.insecureskipverify=true
-      # - --traefiklog.filePath="/logs/traefik.log"
+      - --accesslog=true
+      - "--accesslog.filePath=/logs/access.log"
+      - --log.level=DEBUG
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
           - node.role == manager
-    networks:
-      - net
 
-networks:
-  net:
-    name: VCC_stack_default
-#    external: true
+#networks:
+#  traefik-public:
+#    driver: overlay
+#    attachable: true        

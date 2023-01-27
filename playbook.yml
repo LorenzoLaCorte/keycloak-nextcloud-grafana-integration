@@ -34,7 +34,7 @@
   hosts: all
   become: true
   roles:
-    - registry-client
+    - registry-login
 
 - name: Traefik setup
   hosts: nfs-servers

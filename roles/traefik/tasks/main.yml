@@ -1,15 +1,9 @@
 ---
-- name: Create a network for Traefik
-  docker_network:
-    name: traefik-public
-    driver: overlay
-    scope: swarm
-
-- name: Create ACME file
-  ansible.builtin.file:
-    path: /data/traefik/acme.json
-    state: touch
-    mode: '0600'    
+# - name: Create ACME file
+#   ansible.builtin.file:
+#     path: /data/traefik/acme.json
+#     state: touch
+#     mode: '0600'    
    
 - name: Registering domain names
   ansible.builtin.lineinfile:
@@ -28,7 +22,7 @@
     mode: '0755'
   with_items:
     - /data/certs
-    - /data/traefik/logs     
+    - /data/traefik
 
 - name: Build reverse proxy image
   community.docker.docker_image:

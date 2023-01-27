@@ -1,0 +1,23 @@
+ID             NAME                                      MODE         REPLICAS   IMAGE                                                     PORTS
+cfr2zmbrq2ln   VCC_stack_keycloak                        replicated   1/1        quay.io/keycloak/keycloak:20.0.1                          
+vta2aky2geq2   VCC_stack_nextcloud                       replicated   1/1        nextcloud:23.0-apache                                     
+muqff7z3k4jg   VCC_stack_nextcloud-keycloak-integrator   replicated   1/1        10.255.255.10:5000/nextcloud-keycloak-integrator:latest   
+d5fguj0jkm7v   VCC_stack_postgres                        replicated   1/1        postgres:15.1                                             
+wkakrn0l8wck   VCC_stack_reverse-proxy-https-init        replicated   0/1        10.255.255.10:5000/rev-proxy:latest                       
+lvvldbq8plor   VCC_stack_traefik                         replicated   1/1        traefik:v2.9.6                                            *:80->80/tcp, *:6880->8080/tcp
+j3iod4aymk5l   registry                                  replicated   1/1        distribution/distribution:2.8.1                           *:5000->5000/tcp
+ID                          NAME                                        IMAGE                                                                                                      NODE      DESIRED STATE   CURRENT STATE             ERROR                       PORTS
+u5i4rnglvc8soqfim13k1lxx2   VCC_stack_keycloak.1                        quay.io/keycloak/keycloak:20.0.1@sha256:8830f76112b62231f17b43f115a3deca4de7e4a33eeee298e85cb295c5810e8a   node1     Running         Running 11 seconds ago                                
+ll9yv2w4iadipx9rpakxste7q   VCC_stack_nextcloud-keycloak-integrator.1   10.255.255.10:5000/nextcloud-keycloak-integrator:latest                                                    node1     Running         Running 5 seconds ago                                 
+faqqgm7vc2ja465bzzexk2fkv   VCC_stack_nextcloud.1                       nextcloud:23.0-apache@sha256:fa7ad48ab0185d2d38bdc412890168fb27771b41e6ba9fc8dafda569129d946d              node1     Running         Running 5 seconds ago                                 
+3jgizx2y0w903zpqttf93bq9c   VCC_stack_postgres.1                        postgres:15.1@sha256:6b07fc4fbcf551ea4546093e90cecefc9dc60d7ea8c56a4ace704940b6d6b7a3                      node1     Running         Running 4 seconds ago                                 *:5432->5432/tcp,*:5432->5432/tcp
+msj6adgsb3h8x17q2ldoivg79   VCC_stack_reverse-proxy-https-init.1        10.255.255.10:5000/rev-proxy:latest                                                                        node1     Shutdown        Complete 5 seconds ago                                
+y1vcapg3tf9e1jl1mk9iyrgc9   VCC_stack_traefik.1                         traefik:v2.9.6@sha256:bb7be8d50edf73d8d3a812ac8873ef354a0fe9b40d7f3880747b43a3525855d2                     node1     Running         Running 3 seconds ago                                 
+zkrxw6qic408vbn6l1b5k8kuh   registry.1                                  distribution/distribution:2.8.1                                                                            node1     Running         Running 45 seconds ago                                
+womxhzuygguck65zzj9vjew0x    \_ registry.1                              distribution/distribution:2.8.1                                                                            node1     Shutdown        Failed 50 seconds ago     "task: non-zero exit (2)"   
+5vmixngk3vzys2ooo2qpah7u4    \_ registry.1                              distribution/distribution:2.8.1                                                                            node1     Shutdown        Shutdown 14 minutes ago                               
+tg4jadp29edaw9q36bs4zhh6o    \_ registry.1                              distribution/distribution:2.8.1                                                                            node1     Shutdown        Failed 28 minutes ago     "task: non-zero exit (2)"   
+nlcrdbev3gp866rw51tbtpx1p    \_ registry.1                              distribution/distribution:2.8.1                                                                            node1     Shutdown        Failed 29 minutes ago     "task: non-zero exit (2)"   
+
+
+------------ LOGS ------------

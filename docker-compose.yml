@@ -9,8 +9,8 @@ services:
     volumes:
       - /data/postgresql/data_dir:/var/lib/postgresql/data
       - /data/postgresql/sql:/docker-entrypoint-initdb.d
-    #networks:
-    #  - traefik-public
+    networks:
+      - traefik-public
     deploy:
       mode: replicated
       placement:
@@ -42,15 +42,15 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./keycloak.log:/logs/keycloak.log 
+      - ./logs/keycloak/keycloak.log:/logs/keycloak.log
+    networks:
+      - traefik-public
     #ports:
     #  - "8081:8080"  
     #ports:
     #  - target: 591
     #    published: 591
     #    mode: host
-    #networks:
-    #  - traefik-public
     deploy:
       mode: replicated
       placement:
@@ -87,9 +87,11 @@ services:
       NEXTCLOUD_ADMIN_PASSWORD: admin
     volumes:
       - /data/nextcloud:/var/www/html
-      - ./nextcloud.log:/var/www/nextcloud/data/nextcloud.log
+      - ./logs/nextcloud/:/var/www/nextcloud/data/
     depends_on:
       - postgres 
+    networks:
+      - traefik-public
     #ports:
     #  - 6081:80 
     #ports:
@@ -140,6 +142,8 @@ services:
     depends_on:
       - keycloak
       - nextcloud 
+    networks:
+      - traefik-public
     deploy:
       mode: replicated
       placement:
@@ -159,6 +163,8 @@ services:
     volumes:
       - /data/certs:/etc/ssl/traefik
       - /data/traefik:/etc/traefik/dynamic
+    networks:
+      - traefik-public
     deploy:
       restart_policy:
         condition: none
@@ -174,12 +180,12 @@ services:
     volumes:
       - /data/certs:/etc/ssl/traefik
       - /data/traefik:/etc/traefik/dynamic
-      - /data/traefik/logs:/logs
+      - ./logs/traefik:/logs/
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # - /data/traefik/acme.json:/le/acme.json
       # - ./volumes/traefik-config/config.yml:/etc/traefik/traefik.yml
-    #networks:
-    #  - traefik-public
+    networks:
+      - traefik-public
     ports:
       # HTTP port
       #- target: 80
@@ -225,7 +231,8 @@ services:
         constraints:
           - node.role == manager
 
-#networks:
-#  traefik-public:
-#    driver: overlay
-#    attachable: true        
+networks:
+  traefik-public:
+    driver: overlay
+    name: traefik-public
+    attachable: true

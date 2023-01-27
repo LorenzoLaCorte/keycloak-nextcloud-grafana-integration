@@ -1,4 +1,21 @@
 ---
+- name: Create directories needed for logging if they do not exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0777'
+  with_items:
+    - "{{ playbook_dir }}/logs/traefik"
+    - "{{ playbook_dir }}/logs/nextcloud"
+
+- name: Create file needed for keycloak logging
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: touch
+    mode: '0777'
+  with_items:
+    - "{{ playbook_dir }}/logs/keycloak/keycloak.log"
+
 - name: Deploy stack from a compose file
   docker_stack:
     state: present

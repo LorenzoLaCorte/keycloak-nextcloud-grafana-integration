@@ -102,21 +102,18 @@ SERVICES := \
 
 .PHONY: clean
 clean: 
-	sudo docker stack rm $(STACKNAME) || \
-	sudo rm -r /data/traefik/logs/traefik.log || \
-	sudo docker network rm traefik-public || \
-	sudo rm -r ./logs/*
+	sudo rm -r ./logs/* ; \
+	sudo docker stack rm $(STACKNAME)
 	
 .PHONY: reset
 reset: clean 
-	sudo docker system prune --all || \
+	sudo docker system prune --all ; \
 	sudo rm -r /data/*
 
 .PHONY: logs
 logs:
-	sudo docker service ls > logs/logs.txt && \
-	sudo docker service ps --no-trunc $(SERVICES) >> logs/logs.txt && \
-	printf "\n\n------------ LOGS ------------\n" >> logs/logs.txt
+	sudo docker service ls > logs/logs.txt ; \
+	sudo docker service ps --no-trunc $(SERVICES) >> logs/logs.txt
 # for service in $(SERVICES) ; do \
 		sudo docker service logs -f $$service >> logs/logs.txt ; \
 	done

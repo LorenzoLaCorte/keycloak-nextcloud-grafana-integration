@@ -1,4 +1,12 @@
 ---
+- name: Build nextcloud image and push it to a private repo
+  community.docker.docker_image:
+    build:
+      path: "{{playbook_dir}}/images/nextcloud/container/"
+    name: 10.255.255.10:5000/nextcloud
+    push: true
+    source: build
+
 - name: Create nextcloud data directory if it does not exist
   ansible.builtin.file:
     path: "{{ data_vol }}"

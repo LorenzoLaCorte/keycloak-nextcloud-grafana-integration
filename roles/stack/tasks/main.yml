@@ -24,14 +24,3 @@
     name: VCC_stack
     compose:
       - "{{ playbook_dir }}/docker-compose.yml"
-
-- name: Adding entry to trusted domains
-  ansible.builtin.lineinfile:
-    path: "{{ playbook_dir }}/data/nextcloud/config/config.php"
-    insertafter: 0 => 'localhost',
-    line: 1 => '192.168.50.10',
-
-- name: restart service
-  community.docker.docker_compose:
-    definition: "{{ playbook_dir }}/docker-compose.yml"  
-    state: restarted

@@ -77,7 +77,7 @@ services:
         #- "traefik.http.middlewares.keycloak_proto.headers.customrequestheaders.X-Forwarded-Proto=https"   
 
   nextcloud:
-    image: nextcloud:23.0-apache
+    image: 10.255.255.10:5000/nextcloud
     environment: 
       POSTGRES_DB: nextcloud
       POSTGRES_USER: nextcloud

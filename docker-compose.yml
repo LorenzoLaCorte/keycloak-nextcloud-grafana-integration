@@ -88,7 +88,7 @@ services:
       NEXTCLOUD_ADMIN_PASSWORD: admin
     volumes:
       - /data/nextcloud:/var/www/html
-      - ./logs/nextcloud/:/var/www/nextcloud/data/
+      - ./logs/nextcloud/nextcloud.log:/nextcloud.log
     depends_on:
       - postgres 
     networks:

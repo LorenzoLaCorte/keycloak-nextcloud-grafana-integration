@@ -97,7 +97,7 @@ echo 'Nextcloud ready'
 echo "Applying network settings..."
 runOCC config:system:set trusted_domains 1 --value="192.168.50.10"
 runOCC config:system:set trusted_domains 2 --value="cloud.localdomain"
-runOCC config:system:set trusted_domains 3 --value="10.255.255.10"
+# runOCC config:system:set trusted_domains 3 --value="10.255.255.10"
 
 
 # setString 192.168.50.10 trusted_domains[1]

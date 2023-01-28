@@ -17,6 +17,7 @@
     mode: '0777'
   with_items:
     - "{{ playbook_dir }}/logs/keycloak/keycloak.log"
+    - "{{ playbook_dir }}/logs/nextcloud/nextcloud.log"
 
 - name: Deploy stack from a compose file
   docker_stack:

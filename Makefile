@@ -117,3 +117,12 @@ logs:
 # for service in $(SERVICES) ; do \
 		sudo docker service logs -f $$service >> logs/logs.txt ; \
 	done
+
+.PHONY: enter
+enter:
+ifndef id
+	$(error Please set container id)
+endif
+# sudo docker ps -aqf "name=$(id)"
+# docker exec -it $(docker container ls | grep $(name) | awk '{print $1}') /bin/bash
+	sudo docker exec -it $(id) /bin/sh

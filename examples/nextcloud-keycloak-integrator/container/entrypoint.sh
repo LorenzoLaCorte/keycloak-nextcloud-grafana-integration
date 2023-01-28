@@ -40,13 +40,13 @@ echo 'Keycloak container found'
 
 # trusted domains
 echo "Applying network settings..."
-php /var/www/html/occ config:system:set trusted_domains 1 --value="192.168.50.10"
+runOCC config:system:set trusted_domains 1 --value="192.168.50.10"
 
 # Wait until Keycloak is alive
-until runKeycloak curl -sSf http://127.0.0.1:8080; do
-    sleep 1
-done
-echo 'Keycloak alive'
+#until runKeycloak curl -sSf http://127.0.0.1:8080; do
+#    sleep 1
+#done
+#echo 'Keycloak alive'
 
 # Create 'vcc' keycloak realm
 if [ "$(keycloakCurl -o /dev/null -sw '%{http_code}' http://127.0.0.1:8080/admin/realms/vcc)" = "404" ]; then

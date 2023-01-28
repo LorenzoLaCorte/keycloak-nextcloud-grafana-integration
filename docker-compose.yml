@@ -26,6 +26,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:20.0.1
+    container_name: VCC_stack_keycloak
     command: 
       - start-dev
       - --log-level=debug
@@ -126,8 +127,8 @@ services:
         #- "traefik.http.services.VCC_stack_nextcloud.loadbalancer.server.port=8081"
         #- "traefik.http.middlewares.nextcloud_proto.headers.customrequestheaders.X-Forwarded-Proto=https" 
 
-  nextcloud-keycloak-integrator:
-    image: 10.255.255.10:5000/nextcloud-keycloak-integrator
+  integrator:
+    image: 10.255.255.10:5000/integrator
     environment: 
       NEXTCLOUD_CONTAINER_NAME: VCC_stack_nextcloud
       KEYCLOAK_CONTAINER_NAME: VCC_stack_keycloak
@@ -199,7 +200,7 @@ services:
       #  Web UI (enabled by --api.insecure=true)
     depends_on:
       - reverse-proxy-https-init
-      - nextcloud-keycloak-integrator  
+      - integrator  
     command:
     # enable Web UI
       - --api.insecure=true

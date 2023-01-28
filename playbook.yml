@@ -48,6 +48,6 @@
   roles:
     - database
     - nextcloud
-    - nextcloud-keycloak-integrator
+    - integrator
     - stack
     

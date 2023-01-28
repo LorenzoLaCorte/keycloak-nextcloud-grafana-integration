@@ -1,0 +1,20 @@
+---
+- name: Erase image in order to re-execute entrypoint.sh
+  community.docker.docker_image:
+    build:
+      path: "{{playbook_dir}}/examples/integrator/container/"
+      nocache: true
+    name: 10.255.255.10:5000/integrator
+    source: build
+    state: absent
+    force_absent: true
+
+- name: Build an image and push it to a private repo
+  community.docker.docker_image:
+    build:
+      path: "{{playbook_dir}}/examples/integrator/container/"
+      nocache: true
+    name: 10.255.255.10:5000/integrator
+    push: true
+    source: build
+    debug: true

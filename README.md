@@ -116,10 +116,10 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 
 #### nextcloud
 
-#### nextcloud-keycloak-integrator
-- build the image using the dockerfile inside examples/nextcloud-keycloak-integrator/container
+#### integrator
+- build the image using the dockerfile inside examples/integrator/container
 - push the image inside our registry
-- deploy the service nextcloud-keycloak-integrator
+- deploy the service integrator
 
 ## Facilities available
 

@@ -4,14 +4,16 @@
 #
 # Nextcloud
 runOCC() {
-    docker exec -i -u www-data "$NEXTCLOUD_CONTAINER_NAME" php occ "$@"
+    NEXTCLOUD_ID=$(docker ps | grep "$NEXTCLOUD_CONTAINER_NAME" | awk '{print $1}')
+    docker exec -i -u www-data "$NEXTCLOUD_ID" php occ "$@"
 }
 setBoolean() { runOCC config:system:set --value="$2" --type=boolean -- "$1"; }
 setInteger() { runOCC config:system:set --value="$2" --type=integer -- "$1"; }
 setString() { runOCC config:system:set --value="$2" --type=string -- "$1"; }
 # Keycloak
 runKeycloak() {
-    docker exec -i "$KEYCLOAK_CONTAINER_NAME" "$@"
+    KEYCLOAK_ID=$(docker ps | grep $KEYCLOAK_CONTAINER_NAME | awk '{print $1}')
+    docker exec -i "$KEYCLOAK_ID" "$@"
 }
 keycloakAdminToken() {
     runKeycloak curl -X POST "http://localhost:8080/realms/master/protocol/openid-connect/token" \
@@ -38,15 +40,11 @@ until docker inspect "$KEYCLOAK_CONTAINER_NAME"; do
 done
 echo 'Keycloak container found'
 
-# trusted domains
-echo "Applying network settings..."
-runOCC config:system:set trusted_domains 1 --value="192.168.50.10"
-
 # Wait until Keycloak is alive
-#until runKeycloak curl -sSf http://127.0.0.1:8080; do
-#    sleep 1
-#done
-#echo 'Keycloak alive'
+until runKeycloak curl -sSf http://127.0.0.1:8080; do
+    sleep 1
+done
+echo 'Keycloak alive'
 
 # Create 'vcc' keycloak realm
 if [ "$(keycloakCurl -o /dev/null -sw '%{http_code}' http://127.0.0.1:8080/admin/realms/vcc)" = "404" ]; then
@@ -94,6 +92,11 @@ until runOCC status --output json_pretty | grep 'installed' | grep -q 'true'; do
     sleep 1
 done
 echo 'Nextcloud ready'
+
+# trusted domains
+echo "Applying network settings..."
+# runOCC config:system:set trusted_domains 1 --value="192.168.50.10"
+setString 192.168.50.10 trusted_domains[1]
 
 # Install OpenID Connect login app on Nextcloud
 runOCC app:install oidc_login

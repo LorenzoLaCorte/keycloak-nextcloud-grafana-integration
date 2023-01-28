@@ -80,7 +80,7 @@ VCC_ROLES := \
 	logging \
 	monitoring \
 	nextcloud \
-	nextcloud-keycloak-integrator \
+	integrator \
 	nfs-client \
 	nfs-server \
 	registry \
@@ -96,7 +96,7 @@ SERVICES := \
 	VCC_stack_postgres \
 	VCC_stack_keycloak \
 	VCC_stack_nextcloud \
-	VCC_stack_nextcloud-keycloak-integrator \
+	VCC_stack_integrator \
 	VCC_stack_traefik \
 	VCC_stack_reverse-proxy-https-init
 
@@ -108,7 +108,8 @@ clean:
 .PHONY: reset
 reset: clean 
 	sudo docker system prune --all ; \
-	sudo rm -r /data/*
+	sudo rm -r /data/* ; \
+	sudo docker service rm registry
 
 .PHONY: logs
 logs:

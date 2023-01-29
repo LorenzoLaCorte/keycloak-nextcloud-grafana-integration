@@ -78,7 +78,7 @@ if [ "$(findExaminer | jq -r '. | length')" = "0" ]; then
         -X POST \
         -H 'Content-Type: application/json; charset=UTF-8' \
         --data "{\"id\":\"examiner\",\"username\":\"vcc-examiner\",\"firstName\":\"VCC\",\"lastName\":\"Examiner\",\"email\":\"vcc.examiner@bots.dibris.unige.it\",\"emailVerified\":true,\"enabled\":true}" \
-        http://127.0.0.1:8080/admin/realms/vcc/users
+        'http://127.0.0.1:8080/admin/realms/vcc/users'
     user_id=$(findExaminerId)
     keycloakCurl \
         -X PUT \

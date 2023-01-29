@@ -20,9 +20,9 @@ services:
       restart_policy:
         condition: on-failure
     ports:
-      - target: 5432
-        published: 5432
-        mode: host
+     - target: 5432
+       published: 5432
+       mode: host
 
   keycloak:
     image: quay.io/keycloak/keycloak:20.0.1
@@ -32,10 +32,19 @@ services:
       - --log-level=debug
       - --log=console,file
       - --log-file=/logs/keycloak.log
+      - --hostname=auth.localdomain
+      #- --port=8080
+      #- --proxy=edge
+      #- --http-relative-path=/auth
+      - --hostname-strict-https=false
     environment: 
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HOSTNAME: localhost
+      KC_PROXY_ADDRESS_FORWARDING: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME: auth.localdomain
+      KC_PROXY: edge
+      KC_HTTP_ENABLED: "true"
       KC_DB: postgres 
       KC_DB_URL: jdbc:postgresql://10.255.255.10:5432/keycloak 
       KC_DB_PASSWORD: keycloak 
@@ -45,13 +54,11 @@ services:
     volumes:
       - ./logs/keycloak/keycloak.log:/logs/keycloak.log
     networks:
-      - traefik-public
-    #ports:
-    #  - "8081:8080"  
-    #ports:
-    #  - target: 591
-    #    published: 591
-    #    mode: host
+      - traefik-public  
+    # ports:
+    #   - target: 8080
+    #     published: 8080
+    #     mode: host
     deploy:
       mode: replicated
       placement:
@@ -69,7 +76,9 @@ services:
         - "traefik.docker.network=traefik-public"
         - "traefik.http.routers.keycloak_route.middlewares=VCC_stack_keycloak_proto"
         - "traefik.http.services.VCC_stack_keycloak.loadbalancer.server.port=8080"
-        - "traefik.http.middlewares.VCC_stack_keycloak_proto.headers.customrequestheaders.X-Forwarded-Proto=https"   
+        - "traefik.http.middlewares.VCC_stack_keycloak_proto.headers.customrequestheaders.X-Forwarded-Proto=https"
+        #- "traefik.http.middlewares.VCC_stack_keycloak_proto.headers.customrequestheaders.X-Forwarded-For=192.168.50.1"
+        #- "traefik.http.middlewares.VCC_stack_keycloak_proto.headers.customrequestheaders.X-Forwarded-Host=auth.localdomain"  
 
   nextcloud:
     image: nextcloud:23.0-apache
@@ -87,14 +96,10 @@ services:
       - postgres 
     networks:
       - traefik-public
-    #ports:
-    #  - 6081:80 
-    #ports:
-    #  - target: 8008
-    #    published: 8008
-    #    mode: host
-    #networks:
-    #  - traefik-public
+    # ports:
+    #   - target: 80
+    #     published: 80
+    #     mode: host
     deploy:
       mode: replicated
       placement:
@@ -123,8 +128,8 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
       SAMPLE_USER_PASSWORD: itsdifficult
       OIDC_CLIENT_ID: nextcloud 
-      OIDC_PROVIDER_URL: http://10.255.255.10:8080/realms/vcc
-      OIDC_LOGOUT_URL: http://10.255.255.10/apps/oidc_login/oidc
+      OIDC_PROVIDER_URL: http://auth.localdomain/realms/vcc
+      OIDC_LOGOUT_URL: http://auth.localdomain/apps/oidc_login/oidc
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:

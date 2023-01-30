@@ -1,21 +1,47 @@
 #!/bin/sh
+
+NEXTCLOUD_CONTAINER_NAME=VCC_stack_nextcloud
+KEYCLOAK_CONTAINER_NAME=VCC_stack_keycloak
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=admin
+SAMPLE_USER_PASSWORD=itsdifficult
+OIDC_CLIENT_ID=nextcloud 
+OIDC_PROVIDER_URL=https://auth.localdomain/realms/vcc/
+OIDC_LOGOUT_URL=https://auth.localdomain/apps/oidc_login/oidc
+OIDC_CLIENT_SECRET=pippo
+
 #
 # Helper functions
-#
+
+# Keycloak
+keycloakAdminToken() {
+    curl -X POST "keycloak:8080/realms/master/protocol/openid-connect/token" \
+        --data-urlencode "username=${KEYCLOAK_ADMIN_USER}" \
+        --data-urlencode "password=${KEYCLOAK_ADMIN_PASSWORD}" \
+        --data-urlencode 'grant_type=password' \
+        --data-urlencode 'client_id=admin-cli'
+}
+keycloakCurl() {
+    curl \
+        --header "Authorization: Bearer $(keycloakAdminToken | jq -r '.access_token')" \
+        "$@"
+}
+
 # Nextcloud
 runOCC() {
-    NEXTCLOUD_ID=$(docker ps | grep "$NEXTCLOUD_CONTAINER_NAME" | awk '{print $1}')
-    docker exec -i -u www-data "$NEXTCLOUD_ID" php occ "$@"
+    php /usr/src/nextcloud/occ "$@"
 }
 setBoolean() { runOCC config:system:set --value="$2" --type=boolean -- "$1"; }
 setInteger() { runOCC config:system:set --value="$2" --type=integer -- "$1"; }
 setString() { runOCC config:system:set --value="$2" --type=string -- "$1"; }
 
-# Wait until Nextcloud container appears
-until docker inspect "$NEXTCLOUD_CONTAINER_NAME"; do
+# Wait until Keycloak is alive
+until curl -sSf http://keycloak:8080; do
     sleep 1
 done
-echo 'Nextcloud container found'
+echo 'Keycloak alive'
+
+# OIDC_CLIENT_SECRET=$(keycloakCurl http://keycloak:8080/admin/realms/vcc/clients/nextcloud | jq -r '.secret')
 
 # Wait until Nextcloud install is complete
 until runOCC status --output json_pretty | grep 'installed' | grep -q 'true'; do
@@ -27,10 +53,7 @@ echo 'Nextcloud ready'
 echo "Applying network settings..."
 runOCC config:system:set trusted_domains 1 --value="192.168.50.10"
 runOCC config:system:set trusted_domains 2 --value="cloud.localdomain"
-# runOCC config:system:set trusted_domains 3 --value="10.255.255.10"
 
-
-# setString 192.168.50.10 trusted_domains[1]
 setString log_type file
 setString logfile nextcloud.log
 setString loglevel 0 

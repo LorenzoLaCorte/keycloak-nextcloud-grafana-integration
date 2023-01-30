@@ -1,0 +1,32 @@
+{
+  "displayName":"Virtualization and Cloud Computing",
+  "id":"vcc",
+  "realm":"vcc",
+  "enabled":true,
+  "clients": [
+    { 
+      "id": "nextcloud",
+      "clientId": "nextcloud",
+      "description": "Integration with Nextcloud",
+      "publicClient": false,
+      "redirectUris": ["*"],
+      "enabled": true,
+      "secret": "pippo"
+    }],
+  "users": [
+    {
+      "id": "examiner",
+      "username": "vcc-examiner",
+      "firstName": "VCC",
+      "lastName": "Examiner",
+      "email": "vcc.examiner@bots.dibris.unige.it",
+      "emailVerified": true,
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "rawPassword",
+          "value": "itsdifficult"
+        }
+      ]
+    }]
+}

@@ -8,7 +8,7 @@
     - "/data/logs/traefik"
     - "/data/logs/nextcloud"
     - "/data/logs/keycloak"
-
+    - "/data/volumes/"
 
 - name: Create file needed for keycloak logging
   ansible.builtin.file:
@@ -18,6 +18,12 @@
   with_items:
     - "/data/logs/keycloak/keycloak.log"
     - "/data/logs/nextcloud/nextcloud.log"
+
+- name: Copy dir with entrypoints
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/volumes/"
+    dest: /data/volumes/
+    mode: '0777'
 
 - name: Deploy stack from a compose file
   docker_stack:

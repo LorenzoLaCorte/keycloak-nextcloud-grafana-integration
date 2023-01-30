@@ -48,6 +48,5 @@
   roles:
     - database
     - nextcloud
-    - integrator
     - stack
     

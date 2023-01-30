@@ -80,7 +80,6 @@ VCC_ROLES := \
 	logging \
 	monitoring \
 	nextcloud \
-	integrator \
 	nfs-client \
 	nfs-server \
 	registry \
@@ -96,7 +95,6 @@ SERVICES := \
 	VCC_stack_postgres \
 	VCC_stack_keycloak \
 	VCC_stack_nextcloud \
-	VCC_stack_integrator \
 	VCC_stack_traefik \
 	VCC_stack_reverse-proxy-https-init
 
@@ -113,10 +111,10 @@ reset: clean
 
 .PHONY: logs
 logs:
-	sudo rm -r ./logs/* ; \
+	sudo cp -R /data/logs ./ ; \
+	sudo chmod -R 777 ./logs ; \
 	sudo docker service ls > logs/logs.txt ; \
-	sudo docker service ps --no-trunc $(SERVICES) >> logs/logs.txt ; \
-	sudo cp -R /data/logs ./logs
+	sudo docker service ps --no-trunc $(SERVICES) >> logs/logs.txt ; 
 # for service in $(SERVICES) ; do \
 		sudo docker service logs -f $$service >> logs/logs.txt ; \
 	done

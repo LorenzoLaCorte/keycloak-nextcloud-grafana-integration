@@ -14,8 +14,8 @@ services:
     deploy:
       mode: replicated
       # placement:
-      #   constraints:
-      #     - "node.role==manager"
+        # constraints:
+          # - "node.role==manager"
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -26,16 +26,13 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:20.0.1
-    #container_name: VCC_stack_keycloak
     command: 
       - start-dev
+      - --import-realm
       - --log-level=debug
       - --log=console,file
       - --log-file=/logs/keycloak.log
       - --hostname=auth.localdomain
-      #- --port=8080
-      #- --proxy=edge
-      #- --http-relative-path=/auth
       - --hostname-strict-https=false
     environment: 
       KEYCLOAK_ADMIN: admin
@@ -52,18 +49,15 @@ services:
     depends_on:
       - postgres
     volumes:
+      - /data/volumes/keycloak/realm.json:/opt/keycloak/data/import/realm.json
       - /data/logs/keycloak/keycloak.log:/logs/keycloak.log
     networks:
       - traefik-public  
-    # ports:
-    #   - target: 8080
-    #     published: 8080
-    #     mode: host
     deploy:
       mode: replicated
-      # placement:
-      #   constraints:
-      #     - "node.role==manager"
+      placement:
+        constraints:
+          - "node.role==manager"
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -76,12 +70,13 @@ services:
         - "traefik.docker.network=traefik-public"
         - "traefik.http.routers.keycloak_route.middlewares=VCC_stack_keycloak_proto"
         - "traefik.http.services.VCC_stack_keycloak.loadbalancer.server.port=8080"
-        - "traefik.http.middlewares.VCC_stack_keycloak_proto.headers.customrequestheaders.X-Forwarded-Proto=https"
-        #- "traefik.http.middlewares.VCC_stack_keycloak_proto.headers.customrequestheaders.X-Forwarded-For=192.168.50.1"
-        #- "traefik.http.middlewares.VCC_stack_keycloak_proto.headers.customrequestheaders.X-Forwarded-Host=auth.localdomain"  
+        - "traefik.http.middlewares.VCC_stack_keycloak_proto.headers.customrequestheaders.X-Forwarded-Proto=https" 
 
   nextcloud:
     image: nextcloud:23.0-apache
+    #entrypoint: ["/entrypoint.sh"]   
+    #command: ["/set_config.sh"]
+    entrypoint: ["/set_config.sh"]   
     environment: 
       POSTGRES_DB: nextcloud
       POSTGRES_USER: nextcloud
@@ -92,19 +87,16 @@ services:
     volumes:
       - /data/nextcloud:/var/www/html
       - /data/logs/nextcloud/nextcloud.log:/nextcloud.log
+      - /data/volumes/nextcloud/set_config.sh:/set_config.sh
     depends_on:
       - postgres 
     networks:
       - traefik-public
-    # ports:
-    #   - target: 80
-    #     published: 80
-    #     mode: host
     deploy:
       mode: replicated
-      # placement:
-      #   constraints:
-      #     - "node.role==manager"
+      placement:
+        constraints:
+          - "node.role==manager"
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -118,33 +110,6 @@ services:
         - "traefik.http.routers.nextcloud_route.middlewares=VCC_stack_nextcloud_proto"
         - "traefik.http.services.VCC_stack_nextcloud.loadbalancer.server.port=80"
         - "traefik.http.middlewares.VCC_stack_nextcloud_proto.headers.customrequestheaders.X-Forwarded-Proto=https" 
-
-  integrator:
-    image: 10.255.255.10:5000/integrator
-    environment: 
-      NEXTCLOUD_CONTAINER_NAME: VCC_stack_nextcloud
-      KEYCLOAK_CONTAINER_NAME: VCC_stack_keycloak
-      KEYCLOAK_ADMIN_USER: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      SAMPLE_USER_PASSWORD: itsdifficult
-      OIDC_CLIENT_ID: nextcloud 
-      OIDC_PROVIDER_URL: https://auth.localdomain/realms/vcc/
-      OIDC_LOGOUT_URL: https://auth.localdomain/apps/oidc_login/oidc
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    depends_on:
-      - keycloak
-      - nextcloud 
-    networks:
-      - traefik-public
-    deploy:
-      mode: replicated
-      placement:
-        constraints:
-          - "node.role==manager"
-      replicas: 1
-      restart_policy:
-        condition: on-failure
 
   reverse-proxy-https-init:
     image: 10.255.255.10:5000/rev-proxy
@@ -182,12 +147,10 @@ services:
       - target: 443
         published: 443
         mode: host
-      #- 80:80
-      - 6880:8080
       #  Web UI (enabled by --api.insecure=true)
+      - 6880:8080
     depends_on:
       - reverse-proxy-https-init
-      - integrator  
     command:
     # enable Web UI
       - --api.insecure=true

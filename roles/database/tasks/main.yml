@@ -20,15 +20,3 @@
   with_items:
     - "{{ playbook_dir }}/examples/postgres/sql/keycloak.sql"
     - "{{ playbook_dir }}/examples/postgres/sql/nextcloud.sql"
-
-- name: Delete env to allow updates
-  ansible.builtin.file:
-    path: "{{ playbook_dir }}/.env"
-    state: absent 
-
-- name: Update env variables for Compose
-  ansible.builtin.lineinfile:
-    path: "{{ playbook_dir }}/.env"
-    state: present
-    line: "PLAYBOOK_DIR={{ playbook_dir }}"
-    create: yes

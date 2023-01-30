@@ -5,9 +5,9 @@
     state: directory
     mode: '0777'
   with_items:
-    - "{{ playbook_dir }}/logs/traefik"
-    - "{{ playbook_dir }}/logs/nextcloud"
-    - "{{ playbook_dir }}/logs/keycloak"
+    - "/data/logs/traefik"
+    - "/data/logs/nextcloud"
+    - "/data/logs/keycloak"
 
 
 - name: Create file needed for keycloak logging
@@ -16,8 +16,8 @@
     state: touch
     mode: '0777'
   with_items:
-    - "{{ playbook_dir }}/logs/keycloak/keycloak.log"
-    - "{{ playbook_dir }}/logs/nextcloud/nextcloud.log"
+    - "/data/logs/keycloak/keycloak.log"
+    - "/data/logs/nextcloud/nextcloud.log"
 
 - name: Deploy stack from a compose file
   docker_stack:

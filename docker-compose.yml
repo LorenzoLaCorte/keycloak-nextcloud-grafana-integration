@@ -13,20 +13,20 @@ services:
       - traefik-public
     deploy:
       mode: replicated
-      placement:
-        constraints:
-          - "node.role==manager"
+      # placement:
+      #   constraints:
+      #     - "node.role==manager"
       replicas: 1
       restart_policy:
         condition: on-failure
     ports:
      - target: 5432
        published: 5432
-       mode: host
+       # mode: host
 
   keycloak:
     image: quay.io/keycloak/keycloak:20.0.1
-    container_name: VCC_stack_keycloak
+    #container_name: VCC_stack_keycloak
     command: 
       - start-dev
       - --log-level=debug
@@ -46,13 +46,13 @@ services:
       KC_PROXY: edge
       KC_HTTP_ENABLED: "true"
       KC_DB: postgres 
-      KC_DB_URL: jdbc:postgresql://10.255.255.10:5432/keycloak 
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak 
       KC_DB_PASSWORD: keycloak 
       KC_DB_USERNAME: keycloak
     depends_on:
       - postgres
     volumes:
-      - ./logs/keycloak/keycloak.log:/logs/keycloak.log
+      - /data/logs/keycloak/keycloak.log:/logs/keycloak.log
     networks:
       - traefik-public  
     # ports:
@@ -61,9 +61,9 @@ services:
     #     mode: host
     deploy:
       mode: replicated
-      placement:
-        constraints:
-          - "node.role==manager"
+      # placement:
+      #   constraints:
+      #     - "node.role==manager"
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -86,12 +86,12 @@ services:
       POSTGRES_DB: nextcloud
       POSTGRES_USER: nextcloud
       POSTGRES_PASSWORD: nextcloud
-      POSTGRES_HOST: 10.255.255.10
+      POSTGRES_HOST: postgres
       NEXTCLOUD_ADMIN_USER: admin
       NEXTCLOUD_ADMIN_PASSWORD: admin
     volumes:
       - /data/nextcloud:/var/www/html
-      - ./logs/nextcloud/nextcloud.log:/nextcloud.log
+      - /data/logs/nextcloud/nextcloud.log:/nextcloud.log
     depends_on:
       - postgres 
     networks:
@@ -102,9 +102,9 @@ services:
     #     mode: host
     deploy:
       mode: replicated
-      placement:
-        constraints:
-          - "node.role==manager"
+      # placement:
+      #   constraints:
+      #     - "node.role==manager"
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -128,8 +128,8 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
       SAMPLE_USER_PASSWORD: itsdifficult
       OIDC_CLIENT_ID: nextcloud 
-      OIDC_PROVIDER_URL: http://auth.localdomain/realms/vcc
-      OIDC_LOGOUT_URL: http://auth.localdomain/apps/oidc_login/oidc
+      OIDC_PROVIDER_URL: https://auth.localdomain/realms/vcc/
+      OIDC_LOGOUT_URL: https://auth.localdomain/apps/oidc_login/oidc
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
@@ -162,10 +162,7 @@ services:
       restart_policy:
         condition: none
       mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager      
+      replicas: 1  
 
   traefik:
     image: traefik:v2.9.6
@@ -173,10 +170,8 @@ services:
     volumes:
       - /data/certs:/etc/ssl/traefik
       - /data/traefik:/etc/traefik/dynamic
-      - ./logs/traefik:/logs/
+      - /data/logs/traefik:/logs/
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      # - /data/traefik/acme.json:/le/acme.json
-      # - ./volumes/traefik-config/config.yml:/etc/traefik/traefik.yml
     networks:
       - traefik-public
     ports:
@@ -208,11 +203,6 @@ services:
       - --entrypoints.web.forwardedHeaders.insecure=true
       # manually enable services exposed by traefik
       - --providers.docker.exposedByDefault=false
-      #- --certificatesresolvers.leresolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
-      #- --certificatesresolvers.leresolver.acme.email=simoaqui2000@gmail.com
-      # Make sure the this file is available and permission is set correctly
-      #- --certificatesresolvers.leresolver.acme.storage=/le/acme.json
-      #- --certificatesresolvers.leresolver.acme.tlsChallenge=true
       - "--log.filePath=/logs/traefik.log"
       - --accesslog=true
       - "--accesslog.filePath=/logs/access.log"

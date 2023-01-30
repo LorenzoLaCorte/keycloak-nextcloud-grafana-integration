@@ -113,8 +113,10 @@ reset: clean
 
 .PHONY: logs
 logs:
+	sudo rm -r ./logs/* ; \
 	sudo docker service ls > logs/logs.txt ; \
-	sudo docker service ps --no-trunc $(SERVICES) >> logs/logs.txt
+	sudo docker service ps --no-trunc $(SERVICES) >> logs/logs.txt ; \
+	sudo cp -R /data/logs ./logs
 # for service in $(SERVICES) ; do \
 		sudo docker service logs -f $$service >> logs/logs.txt ; \
 	done

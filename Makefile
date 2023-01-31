@@ -126,4 +126,4 @@ ifndef id
 endif
 # sudo docker ps -aqf "name=$(id)"
 # docker exec -it $(docker container ls | grep $(name) | awk '{print $1}') /bin/bash
-	sudo docker exec -it $(id) /bin/sh
+	sudo docker exec -it $(id) /bin/bash

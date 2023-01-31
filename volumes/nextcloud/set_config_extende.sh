@@ -1,4 +1,27 @@
 #!/bin/sh
+
+NEXTCLOUD_CONTAINER_NAME=VCC_stack_nextcloud
+KEYCLOAK_CONTAINER_NAME=VCC_stack_keycloak
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=admin
+SAMPLE_USER_PASSWORD=itsdifficult
+OIDC_CLIENT_ID=nextcloud 
+OIDC_PROVIDER_URL=https://auth.localdomain/realms/vcc/
+OIDC_LOGOUT_URL=https://auth.localdomain/apps/oidc_login/oidc
+OIDC_CLIENT_SECRET=pippo
+
+#
+# Helper functions
+
+# Nextcloud
+runOCC() {
+    php /usr/src/nextcloud/occ "$@"
+}
+setBoolean() { runOCC config:system:set --value="$2" --type=boolean -- "$1"; }
+setInteger() { runOCC config:system:set --value="$2" --type=integer -- "$1"; }
+setString() { runOCC config:system:set --value="$2" --type=string -- "$1"; }
+
+#!/bin/sh
 set -eu
 
 # version_greater A B returns whether A > B
@@ -247,41 +270,13 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ] || [ "${NEXTCLOUD_UP
 
 fi
 
-# ./etc/apache2/envvars
-# mkdir /var/run/apache2
-run_as 'chown -R $(id -u) /var/log/apache2/'
-run_as 'chmod -R 777 /var/log/apache2/'
-run_as 'apache2ctl -D BACKGROUND'
-# apache2ctl start
-
-# --------------------------------------------------------------------------
-
-NEXTCLOUD_CONTAINER_NAME=VCC_stack_nextcloud
-KEYCLOAK_CONTAINER_NAME=VCC_stack_keycloak
-KEYCLOAK_ADMIN_USER=admin
-KEYCLOAK_ADMIN_PASSWORD=admin
-SAMPLE_USER_PASSWORD=itsdifficult
-OIDC_CLIENT_ID=nextcloud 
-OIDC_PROVIDER_URL=https://auth.localdomain/realms/vcc/
-OIDC_LOGOUT_URL=https://auth.localdomain/apps/oidc_login/oidc
-OIDC_CLIENT_SECRET=pippo
-
-#
-# Helper functions
-
-# Nextcloud
-runOCC() {
-    php /var/www/html/occ "$@"
-}
-setBoolean() { runOCC config:system:set --value="$2" --type=boolean -- "$1"; }
-setInteger() { runOCC config:system:set --value="$2" --type=integer -- "$1"; }
-setString() { runOCC config:system:set --value="$2" --type=string -- "$1"; }
-
 # Wait until Keycloak is alive
 until curl -sSf http://keycloak:8080; do
     sleep 1
 done
 echo 'Keycloak alive'
+
+# OIDC_CLIENT_SECRET=$(keycloakCurl http://keycloak:8080/admin/realms/vcc/clients/nextcloud | jq -r '.secret')
 
 # Wait until Nextcloud install is complete
 until runOCC status --output json_pretty | grep 'installed' | grep -q 'true'; do
@@ -317,5 +312,3 @@ setBoolean oidc_login_redir_fallback true
 
 runOCC config:system:set --value=preferred_username --type=string -- oidc_login_attributes id
 runOCC config:system:set --value=email --type=string -- oidc_login_attributes mail
-
-# --------------------------------------------------------------------------

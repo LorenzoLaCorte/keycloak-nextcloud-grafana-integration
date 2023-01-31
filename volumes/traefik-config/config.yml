@@ -50,7 +50,6 @@ http:
         server:
           port: 80
           scheme: https
-        
 
 tls:
   stores:

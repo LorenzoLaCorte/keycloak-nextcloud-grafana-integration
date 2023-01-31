@@ -74,9 +74,6 @@ services:
 
   nextcloud:
     image: nextcloud:23.0-apache
-    #entrypoint: ["/entrypoint.sh"]   
-    #command: ["/set_config.sh"]
-    entrypoint: ["/set_config.sh"]   
     environment: 
       POSTGRES_DB: nextcloud
       POSTGRES_USER: nextcloud
@@ -87,7 +84,7 @@ services:
     volumes:
       - /data/nextcloud:/var/www/html
       - /data/logs/nextcloud/nextcloud.log:/nextcloud.log
-      - /data/volumes/nextcloud/set_config.sh:/set_config.sh
+      - /data/volumes/nextcloud/set_config.sh:/entrypoint.sh
     depends_on:
       - postgres 
     networks:

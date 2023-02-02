@@ -73,7 +73,7 @@ services:
         - "traefik.http.middlewares.VCC_stack_keycloak_proto.headers.customrequestheaders.X-Forwarded-Proto=https" 
 
   nextcloud:
-    image: nextcloud:23.0-apache
+    image: 10.255.255.10:5000/nextcloud
     environment: 
       POSTGRES_DB: nextcloud
       POSTGRES_USER: nextcloud
@@ -84,7 +84,6 @@ services:
     volumes:
       - /data/nextcloud:/var/www/html
       - /data/logs/nextcloud/nextcloud.log:/nextcloud.log
-      - /data/volumes/nextcloud/set_config.sh:/entrypoint.sh
     depends_on:
       - postgres 
     networks:

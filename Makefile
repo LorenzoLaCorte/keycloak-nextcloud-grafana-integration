@@ -23,7 +23,6 @@ run-ansible: ansible-prepare
 	. $(VENV_ACTIVATE_PATH) && ansible-playbook \
 		--inventory inventory.yml \
 		--ssh-common-args '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' \
-		--verbose -v \
 		$(ANSIBLE_ARGS) \
 		$(ANSIBLE_PLAYBOOK)
 
@@ -127,3 +126,7 @@ endif
 # sudo docker ps -aqf "name=$(id)"
 # docker exec -it $(docker container ls | grep $(name) | awk '{print $1}') /bin/bash
 	sudo docker exec -it $(id) /bin/bash
+
+.PHONY: up
+up:
+	docker stack deploy --compose-file docker-compose.yml $(STACKNAME)

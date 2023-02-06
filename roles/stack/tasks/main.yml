@@ -29,5 +29,6 @@
   docker_stack:
     state: present
     name: VCC_stack
+    with_registry_auth: yes
     compose:
       - "{{ playbook_dir }}/docker-compose.yml"

@@ -1,18 +1,14 @@
 ID             NAME                                 MODE         REPLICAS   IMAGE                                 PORTS
-2tyb3ugpdjx1   VCC_stack_keycloak                   replicated   1/1        quay.io/keycloak/keycloak:20.0.1      
-n7q4ra5vgvdo   VCC_stack_nextcloud                  replicated   1/1        10.255.255.10:5000/nextcloud:latest   
-sk10p34hrfiu   VCC_stack_postgres                   replicated   1/1        postgres:15.1                         *:5432->5432/tcp
-pvle3uk2x507   VCC_stack_reverse-proxy-https-init   replicated   0/1        10.255.255.10:5000/rev-proxy:latest   
-muid1kw2am2j   VCC_stack_traefik                    replicated   1/1        traefik:v2.9.6                        *:6880->8080/tcp
-8bu8s8ew4q9g   registry                             replicated   1/1        distribution/distribution:2.8.1       *:5000->5000/tcp
-ID                          NAME                                   IMAGE                                                                                                         NODE      DESIRED STATE   CURRENT STATE             ERROR                       PORTS
-zh3w4yd4wna0v3k0w3g6741gg   VCC_stack_keycloak.1                   quay.io/keycloak/keycloak:20.0.1@sha256:8830f76112b62231f17b43f115a3deca4de7e4a33eeee298e85cb295c5810e8a      node1     Running         Running 36 minutes ago                                
-0994gqqb97czkqq8qxy1jetyg   VCC_stack_nextcloud.1                  10.255.255.10:5000/nextcloud:latest@sha256:6a1902ddf6000c44ee7dd02a2d62b349cf767beeef9c02aaf49b9c5dd0a6158a   node1     Running         Running 9 minutes ago                                 
-jb1knepe7ffhsjr04yrugxbj9    \_ VCC_stack_nextcloud.1              10.255.255.10:5000/nextcloud:latest@sha256:3ddd157c28c33e00bc8e194f72755e388a80db59af8832c2d1a200f5a63ea68e   node1     Shutdown        Shutdown 9 minutes ago                                
-qw9a58lgf9siplbi47y6qhm6o    \_ VCC_stack_nextcloud.1              10.255.255.10:5000/nextcloud:latest@sha256:228d816c9afa6a1a64cb1c7824279bc39af461400027dc8363b875e4076fc454   node1     Shutdown        Shutdown 32 minutes ago                               
-877ujoeipjqjgjsp1q0ospfok   VCC_stack_postgres.1                   postgres:15.1@sha256:a71ed7f2b88694adc4b227aa33d25fffd73b47d5654338ece083c2070288af5f                         node2     Running         Running 36 minutes ago                                
-bs9v1p1rbugzpgrlzyt1fr5jq   VCC_stack_reverse-proxy-https-init.1   10.255.255.10:5000/rev-proxy:latest@sha256:5eb481ec6a98fa514c4f5d87994e624dee931f7700e5d7a8ec1b6162fbdc8814   node2     Shutdown        Complete 36 minutes ago                               
-y73cj98q26xggoppx66udn90h   VCC_stack_traefik.1                    traefik:v2.9.6@sha256:bb7be8d50edf73d8d3a812ac8873ef354a0fe9b40d7f3880747b43a3525855d2                        node1     Running         Running 36 minutes ago                                *:443->443/tcp,*:443->443/tcp,*:80->80/tcp,*:80->80/tcp
-zaddnwcv6qxi3k0hhoscm8iul   registry.1                             distribution/distribution:2.8.1                                                                               node1     Running         Running 37 minutes ago                                
-s3ecx6qip888azkdwu3on7cte    \_ registry.1                         distribution/distribution:2.8.1                                                                               node1     Shutdown        Failed 37 minutes ago     "task: non-zero exit (2)"   
-umhlhcwj4eek1yjhfbnkdbut2    \_ registry.1                         distribution/distribution:2.8.1                                                                               node1     Shutdown        Failed 39 minutes ago     "task: non-zero exit (2)"   
+o8rba8q6xig2   VCC_stack_keycloak                   replicated   1/1        quay.io/keycloak/keycloak:20.0.1      
+vkvf852xvjav   VCC_stack_nextcloud                  replicated   1/1        10.255.255.10:5000/nextcloud:latest   
+9qcrqxrmnnv3   VCC_stack_postgres                   replicated   1/1        postgres:15.1                         *:5432->5432/tcp
+xhpc8hlf3klw   VCC_stack_reverse-proxy-https-init   replicated   0/1        10.255.255.10:5000/rev-proxy:latest   
+n2wsp92xuqyj   VCC_stack_traefik                    replicated   1/1        traefik:v2.9.6                        *:6880->8080/tcp
+ucah147hd4ct   registry                             replicated   1/1        distribution/distribution:2.8.1       *:5000->5000/tcp
+ID                          NAME                                   IMAGE                                                                                                         NODE      DESIRED STATE   CURRENT STATE                ERROR     PORTS
+dgbmj2fgguun05s1hn17qst46   VCC_stack_keycloak.1                   quay.io/keycloak/keycloak:20.0.1@sha256:8830f76112b62231f17b43f115a3deca4de7e4a33eeee298e85cb295c5810e8a      node1     Running         Running 17 seconds ago                 
+tfpp413xys2owigkykk0tv29n   VCC_stack_nextcloud.1                  10.255.255.10:5000/nextcloud:latest@sha256:c5170d25574753d59893e0d81df0aa1049ab644016325993062af69ac378c6fa   node2     Running         Running 12 seconds ago                 
+w6ebkgmtvuk9a4n5cg3ejra7j   VCC_stack_postgres.1                   postgres:15.1@sha256:a71ed7f2b88694adc4b227aa33d25fffd73b47d5654338ece083c2070288af5f                         node2     Running         Running about a minute ago             
+yetuh6kr88w5cxevtmktcj1ej   VCC_stack_reverse-proxy-https-init.1   10.255.255.10:5000/rev-proxy:latest@sha256:e332c2936599821fc024e12d1f103ac0fdac3ba55828b4b5fccf65731ead7dec   node2     Shutdown        Complete 49 seconds ago                
+iwnwftzdj9f4a74u0a1b63hhv   VCC_stack_traefik.1                    traefik:v2.9.6@sha256:bb7be8d50edf73d8d3a812ac8873ef354a0fe9b40d7f3880747b43a3525855d2                        node1     Running         Running 35 seconds ago                 *:443->443/tcp,*:443->443/tcp,*:80->80/tcp,*:80->80/tcp
+fg8uluke118vgyuzvu4stwiu5   registry.1                             distribution/distribution:2.8.1                                                                               node1     Running         Running 4 minutes ago                  

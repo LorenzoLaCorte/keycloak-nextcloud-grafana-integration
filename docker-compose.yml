@@ -13,16 +13,12 @@ services:
       - traefik-public
     deploy:
       mode: replicated
-      # placement:
-        # constraints:
-          # - "node.role==manager"
       replicas: 1
       restart_policy:
         condition: on-failure
     ports:
      - target: 5432
        published: 5432
-       # mode: host
 
   keycloak:
     image: quay.io/keycloak/keycloak:20.0.1
@@ -55,9 +51,9 @@ services:
       - traefik-public  
     deploy:
       mode: replicated
-      placement:
-        constraints:
-          - "node.role==manager"
+      # placement:
+      #   constraints:
+      #     - "node.role==manager"
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -93,9 +89,9 @@ services:
       - traefik-public
     deploy:
       mode: replicated
-      placement:
-        constraints:
-          - "node.role==manager"
+      # placement:
+      #   constraints:
+      #     - "node.role==manager"
       replicas: 1
       restart_policy:
         condition: on-failure

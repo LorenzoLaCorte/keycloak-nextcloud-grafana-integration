@@ -8,6 +8,8 @@
     - "/data/logs/traefik"
     - "/data/logs/nextcloud"
     - "/data/logs/keycloak"
+    - "/data/loki"
+    - "/data/grafana"
     - "/data/volumes/"
 
 - name: Create file needed for keycloak logging

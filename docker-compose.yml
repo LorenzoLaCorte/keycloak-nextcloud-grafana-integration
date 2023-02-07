@@ -172,6 +172,53 @@ services:
         constraints:
           - node.role == manager
 
+  fluent-bit:
+    image: cr.fluentbit.io/fluent/fluent-bit:2.0.6 
+    deploy:
+      mode: global
+    environment:
+      - LOKI_URL=http://loki:3100/loki/api/v1/push
+    ports:
+      - "2021:2021"
+    networks:
+      - traefik-public
+    volumes:
+      - /data/volumes/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - /var/lib/docker/containers:/var/lib/docker/containers
+
+  loki:
+    image: grafana/loki:2.7.1
+    ports:
+      - "3100:3100"  
+    networks:
+      - traefik-public
+    volumes:
+      - /data/volumes/loki/loki.yaml:/etc/loki/local-config.yaml
+      - /data/loki:/loki
+
+  grafana:
+    image: grafana/grafana:9.3.1
+    networks:
+      - traefik-public
+    volumes:
+      - /data/grafana:/var/lib/grafana
+      - /data/volumes/grafana:/etc/grafana/provisioning/datasources
+    ports:
+      - target: 3000
+        published: 3000
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.grafana_route.rule=Host(`mon.localdomain`)"
+        - "traefik.http.routers.grafana_route.entrypoints=websecure"
+        - "traefik.http.routers.grafana_route.service=VCC_stack_grafana"
+        - "traefik.http.routers.grafana_route.tls=true"
+        - "traefik.docker.network=traefik-public"
+        - "traefik.http.routers.grafana_route.middlewares=VCC_stack_grafana_proto"
+        - "traefik.http.services.VCC_stack_grafana.loadbalancer.server.port=3000"
+        - "traefik.http.middlewares.VCC_stack_grafana_proto.headers.customrequestheaders.X-Forwarded-Proto=https"    
+        
+
 networks:
   traefik-public:
     driver: overlay

@@ -95,7 +95,10 @@ SERVICES := \
 	VCC_stack_keycloak \
 	VCC_stack_nextcloud \
 	VCC_stack_traefik \
-	VCC_stack_reverse-proxy-https-init
+	VCC_stack_reverse-proxy-https-init \
+	VCC_stack_fluent-bit \
+	VCC_stack_loki \
+	VCC_stack_grafana
 
 .PHONY: clean
 clean: 

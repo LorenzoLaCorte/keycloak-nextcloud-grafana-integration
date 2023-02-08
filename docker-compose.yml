@@ -175,23 +175,36 @@ services:
   fluent-bit:
     image: cr.fluentbit.io/fluent/fluent-bit:2.0.6 
     deploy:
-      mode: global
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
     environment:
-      - LOKI_URL=http://loki:3100/loki/api/v1/push
+      LOKI_URL: http://localhost:3100/loki/api/v1/push
     ports:
-      - "2021:2021"
+      - "2020:2020"
     networks:
       - traefik-public
     volumes:
       - /data/volumes/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - /data/volumes/fluent-bit/parsers.conf:/parsers.conf
       - /var/lib/docker/containers:/var/lib/docker/containers
 
   loki:
     image: grafana/loki:2.7.1
     ports:
-      - "3100:3100"  
+      - target: 3100
+        published: 3100
+        mode: host  
     networks:
       - traefik-public
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager  
     volumes:
       - /data/volumes/loki/loki.yaml:/etc/loki/local-config.yaml
       - /data/loki:/loki
@@ -203,6 +216,12 @@ services:
     volumes:
       - /data/grafana:/var/lib/grafana
       - /data/volumes/grafana:/etc/grafana/provisioning/datasources
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager 
     ports:
       - target: 3000
         published: 3000

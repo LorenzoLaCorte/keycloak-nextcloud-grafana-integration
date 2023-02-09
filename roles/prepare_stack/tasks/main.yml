@@ -1,0 +1,28 @@
+---
+- name: Create directories needed for logging if they do not exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0777'
+  with_items:
+    - "/data/logs/traefik"
+    - "/data/logs/nextcloud"
+    - "/data/logs/keycloak"
+    - "/data/loki"
+    - "/data/grafana"
+    - "/data/volumes/"
+
+- name: Create file needed for keycloak logging
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: touch
+    mode: '0777'
+  with_items:
+    - "/data/logs/keycloak/keycloak.log"
+    - "/data/logs/nextcloud/nextcloud.log"
+
+- name: Copy dir with entrypoints
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/volumes/"
+    dest: /data/volumes/
+    mode: '0777'

@@ -1,36 +1,14 @@
 ---
-- name: Create directories needed for logging if they do not exist
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
+- name: "Render docker-compose file using variables"
+  template:
+    src: "{{ playbook_dir }}/docker-compose.j2"
+    dest: "/docker-compose.yml"
     mode: '0777'
-  with_items:
-    - "/data/logs/traefik"
-    - "/data/logs/nextcloud"
-    - "/data/logs/keycloak"
-    - "/data/loki"
-    - "/data/grafana"
-    - "/data/volumes/"
-
-- name: Create file needed for keycloak logging
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: touch
-    mode: '0777'
-  with_items:
-    - "/data/logs/keycloak/keycloak.log"
-    - "/data/logs/nextcloud/nextcloud.log"
-
-- name: Copy dir with entrypoints
-  ansible.builtin.copy:
-    src: "{{ playbook_dir }}/volumes/"
-    dest: /data/volumes/
-    mode: '0777'
-
+ 
 - name: Deploy stack from a compose file
   docker_stack:
     state: present
     name: VCC_stack
     with_registry_auth: yes
     compose:
-      - "{{ playbook_dir }}/docker-compose.yml"
+      - "/docker-compose.yml"

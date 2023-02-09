@@ -81,6 +81,7 @@ VCC_ROLES := \
 	nextcloud \
 	nfs-client \
 	nfs-server \
+	prepare_stack \
 	registry \
 	registry-client \
 	registry-tls-common
@@ -133,3 +134,14 @@ endif
 .PHONY: up
 up:
 	docker stack deploy --compose-file docker-compose.yml $(STACKNAME)
+
+.PHONY: ssh_node2
+ssh_node2:
+	ssh node2@192.168.50.20
+
+.PHONY: fluent_logs
+fluent_logs:
+ifndef id
+	$(error Please set container id)
+endif
+	sudo docker logs $(id) 2>&1 | more

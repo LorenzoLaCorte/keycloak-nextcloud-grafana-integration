@@ -1,1 +1,14 @@
 ---
+- name: Create directories needed for logging if they do not exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0777'
+    recurse: true
+  with_items:
+    - "/volumes/fluent-bit/"
+    
+- name: "Render fluent-bit.conf file using variables"
+  template:
+    src: "/data/volumes/fluent-bit/fluent-bit.j2"
+    dest: "/volumes/fluent-bit/fluent-bit.conf"

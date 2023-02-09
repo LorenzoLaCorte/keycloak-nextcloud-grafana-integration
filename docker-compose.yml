@@ -174,16 +174,8 @@ services:
 
   fluent-bit:
     image: cr.fluentbit.io/fluent/fluent-bit:2.0.6 
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
     environment:
-      LOKI_URL: http://localhost:3100/loki/api/v1/push
-    ports:
-      - "2020:2020"
+      LOKI_URL: http://loki:3100/loki/api/v1/push
     networks:
       - traefik-public
     volumes:
@@ -193,18 +185,9 @@ services:
 
   loki:
     image: grafana/loki:2.7.1
-    ports:
-      - target: 3100
-        published: 3100
-        mode: host  
+    hostname: loki.hostname
     networks:
       - traefik-public
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager  
     volumes:
       - /data/volumes/loki/loki.yaml:/etc/loki/local-config.yaml
       - /data/loki:/loki
@@ -217,15 +200,6 @@ services:
       - /data/grafana:/var/lib/grafana
       - /data/volumes/grafana:/etc/grafana/provisioning/datasources
     deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager 
-    ports:
-      - target: 3000
-        published: 3000
-    deploy:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.grafana_route.rule=Host(`mon.localdomain`)"
@@ -237,7 +211,6 @@ services:
         - "traefik.http.services.VCC_stack_grafana.loadbalancer.server.port=3000"
         - "traefik.http.middlewares.VCC_stack_grafana_proto.headers.customrequestheaders.X-Forwarded-Proto=https"    
         
-
 networks:
   traefik-public:
     driver: overlay

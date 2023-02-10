@@ -14,14 +14,9 @@
    tag               logs
 
 [FILTER]
-   name   grep
-   match  logs
-   regex  log service
-
-[FILTER]
    Name     parser
    Match    logs
-   Key_Name log
+   Key_Name *
    Parser   json
 
 [OUTPUT]

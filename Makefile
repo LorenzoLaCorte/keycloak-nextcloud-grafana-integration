@@ -99,6 +99,7 @@ SERVICES := \
 	VCC_stack_reverse-proxy-https-init \
 	VCC_stack_fluent-bit \
 	VCC_stack_loki \
+	VCC_stack_prometheus \
 	VCC_stack_grafana
 
 .PHONY: clean
@@ -129,7 +130,7 @@ ifndef id
 endif
 # sudo docker ps -aqf "name=$(id)"
 # docker exec -it $(docker container ls | grep $(name) | awk '{print $1}') /bin/bash
-	sudo docker exec -it $(id) /bin/bash
+	sudo docker exec -it $(id) /bin/sh
 
 .PHONY: up
 up:

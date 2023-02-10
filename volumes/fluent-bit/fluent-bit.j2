@@ -13,6 +13,11 @@
    Skip_Long_Lines   On
    tag               logs
 
+[INPUT]
+   name              node_exporter_metrics
+   tag               metrics
+   scrape_interval   2
+
 [FILTER]
    Name     parser
    Match    logs
@@ -24,4 +29,11 @@
    match           logs
    host            loki.hostname
    port            3100
-   labels          job=fluentbit, host={{ inventory_hostname }}
+   labels          job=docker-logs, host={{ inventory_hostname }}
+
+[OUTPUT]
+   name            prometheus_exporter
+   match           metrics
+   host            0.0.0.0  
+   port            2021 
+   add_label       job node-metrics

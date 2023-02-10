@@ -16,6 +16,8 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+    labels:
+      - "prometheus-job=postgres"
     ports:
      - target: 5432
        published: 5432
@@ -51,9 +53,6 @@ services:
       - traefik-public  
     deploy:
       mode: replicated
-      # placement:
-      #   constraints:
-      #     - "node.role==manager"
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -67,6 +66,7 @@ services:
         - "traefik.http.routers.keycloak_route.middlewares=VCC_stack_keycloak_proto"
         - "traefik.http.services.VCC_stack_keycloak.loadbalancer.server.port=8080"
         - "traefik.http.middlewares.VCC_stack_keycloak_proto.headers.customrequestheaders.X-Forwarded-Proto=https" 
+        - "prometheus-job=keycloak"
 
   nextcloud:
     image: 10.255.255.10:5000/nextcloud
@@ -89,9 +89,6 @@ services:
       - traefik-public
     deploy:
       mode: replicated
-      # placement:
-      #   constraints:
-      #     - "node.role==manager"
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -105,7 +102,8 @@ services:
         - "traefik.http.routers.nextcloud_route.middlewares=VCC_stack_nextcloud_proto"
         - "traefik.http.services.VCC_stack_nextcloud.loadbalancer.server.port=80"
         - "traefik.http.middlewares.VCC_stack_nextcloud_proto.headers.customrequestheaders.X-Forwarded-Proto=https" 
-
+        - "prometheus-job=nextcloud"
+  
   reverse-proxy-https-init:
     image: 10.255.255.10:5000/rev-proxy
     environment: 
@@ -122,7 +120,9 @@ services:
       restart_policy:
         condition: none
       mode: replicated
-      replicas: 1  
+      replicas: 1 
+      labels:
+        - "prometheus-job=rev-proxy"
 
   traefik:
     image: traefik:v2.9.6
@@ -171,6 +171,8 @@ services:
       placement:
         constraints:
           - node.role == manager
+      labels:
+        - "prometheus-job=traefik"
 
   fluent-bit:
     image: cr.fluentbit.io/fluent/fluent-bit:2.0.6 
@@ -184,6 +186,8 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers
     deploy:
       mode: global
+      labels:
+        - "prometheus-job=fluent-bit"
 
   loki:
     image: grafana/loki:2.7.1
@@ -193,6 +197,25 @@ services:
     volumes:
       - /data/volumes/loki/loki.yaml:/etc/loki/local-config.yaml
       - /data/loki:/loki
+    deploy:
+      labels:
+        - "prometheus-job=loki"
+
+  prometheus:
+    image: prom/prometheus:v2.40.6
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /data/volumes/prometheus:/config
+      - /data/prometheus:/prometheus
+    networks:
+      - traefik-public
+    command:
+      - "--config.file=/config/prometheus.yml"
+      - "--storage.tsdb.retention.time=7d"
+      - "--log.level=debug"
+    deploy:
+      mode: replicated
+      replicas: 1
 
   grafana:
     image: grafana/grafana:9.3.1
@@ -212,7 +235,8 @@ services:
         - "traefik.http.routers.grafana_route.middlewares=VCC_stack_grafana_proto"
         - "traefik.http.services.VCC_stack_grafana.loadbalancer.server.port=3000"
         - "traefik.http.middlewares.VCC_stack_grafana_proto.headers.customrequestheaders.X-Forwarded-Proto=https"    
-        
+        - "prometheus-job=grafana"
+
 networks:
   traefik-public:
     driver: overlay

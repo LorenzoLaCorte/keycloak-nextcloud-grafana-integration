@@ -12,7 +12,17 @@
       "redirectUris": ["*"],
       "enabled": true,
       "secret": "pippo"
-    }],
+    },
+    { 
+      "id": "grafana",
+      "clientId": "grafana",
+      "description": "Integration with Grafana",
+      "publicClient": false,
+      "redirectUris": ["*"],
+      "enabled": true,
+      "secret": "pippo"
+    }  
+  ],
   "users": [
     {
       "id": "examiner",

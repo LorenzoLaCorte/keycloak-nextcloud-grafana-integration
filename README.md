@@ -2,12 +2,13 @@
 
 Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte (s4784539)
 
-## Notes 
+# Notes 
 
-### Task 1
+## Task 1
 
 - created machines
   VMs are named VM1 and VM2, hard disk is 20GB and memory is 4096MB
+  We had to set VM1's HD storage to 30GB to solve some memory related issues.
 - configured ssh 
 - change hostnames: node1, node2
 - create 2 network adapters:
@@ -20,26 +21,24 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
   - 192.168.50.10 VM1
   - 192.168.50.20 VM2
 
----> Snapshot Taken: task1
-
-### Task 2,3,4
+## Task 2,3,4
 
 #### Configuring Ansible
-- set up inventory.yml file with  
+- set up inventory.yml file with:  
   - NFS configuration for 2 nodes: nfs-client and nfs-server
   - set up of ssh key on both nodes
-- create and configure the 2 roles nfs-client and nfs-server
+- create and configure the 2 roles: nfs-client and nfs-server
 - change playbook.yml adding host nfs-server and nfs-client
 - change requirements.yml
 - change makefile
 
 #### Configuring Network
-- changed netplan configuring storage network
+- change netplan configuring storage network
   - 10.255.255.10 for node1
   - 10.255.255.20 for node2
 
 #### Configuring SSH
-- ssh-keygen # it generates keys in /home/node1/.ssh
+- ssh-keygen --> it generates keys in /home/node1/.ssh
 
 - from the folder /home/node1/.ssh
   - ssh-copy-id node1@192.168.50.10
@@ -59,10 +58,8 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 - in node2:
   - sudo nano /etc/sudoers.d/devops # insert a line
   - node2 ALL=(ALL) NOPASSWD: ALL
-
---> Snapshot Taken: task4
  
-### Task 5,6
+## Task 5,6
 - follow: https://www.ansiblepilot.com/articles/install-docker-in-debian-like-systems-ansible-module-apt_key-apt_repository-and-apt/
 
 - 4 tasks:
@@ -76,66 +73,86 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
   - ansible_distribution and ansible_architecture are magic variables
     - to use them in links we have to lowercase them -> | lower
 
---> Snapshot Taken: task6
+## Task 7,8,9
 
-### Task 7,8,9
-- create 2 roles:
 #### Docker Swarm Manager
 - Init a new swarm with default parameters
 
 #### Docker Swarm Client
 - join to the swarm using hostvars for addresses and token 
 
-### Task 10, 11, 12, 13
+## Task 10, 11, 12, 13
 - create 3 roles:
-#### registry
+#### registry (server)
 - it deploys the registry on the server/manager
   - enabling TLS using certificates under the folder /data/docker-registry/certs
   - setting up authentication through htpasswd
     - using bcrypt as scheme (the only one supported)
     - generating username and password each time randomly
 
-#### registry-tls-common
+#### registry-tls-common (all)
 - it instructs all single docker hosts to trust TLS certificate copying ca cert inside /etc/docker/certs.d/10.255.255.10:5000
 
-#### registry-client
-- each client logs in leveraging docker_login module
+#### registry-login (all)
+- each node logs in leveraging docker_login module
   - using TLS certificates (insecure registry solved)
   - using randomly generated username and password
-  
-### Task 14,15,16
-- update database role:
-  - each service has its own db
-  - posttgres DB, user and pass are vcc-test
-  - update the entrypoint in order to call sql scripts and create
-    - DBs keycloak and nextcloud (user and pass use the same name) 
 
-### Task 17-25
+## Task 14,15,16
+- deploy one and shared postgres instance through docker compose 
+- database role: update the entrypoint in order to call sql scripts DBs keycloak and nextcloud
+
+## Task 17-25
 
 #### keycloack
+- deploy the service on compose
+- *--import-realm* is used to import a config .json file automatically from the default folder
+- some other flags are used to enable logging and rev-proxy integration
+- the .json file is used to easily configure realm, clients and users
 
-#### nextcloud
+#### nextcloud and integration, sto maledetto
+- a custom image is build starting from the one given:
+  - entrypoint is a new one, which aim is to call the default one and then apply the required modifications for the integration
+  - in particular, our entrypoint has to do its commands with sudo in order to has www-data permissions and -E set to preserve their existing environment variables 
+- extra-hosts are set in order to enable the oidc auto-redirection
 
-#### integrator
-- build the image using the dockerfile inside examples/integrator/container
-- push the image inside our registry
-- deploy the service integrator
+## Task 26-31
 
-## Facilities available
+#### traefik
+- all container are attached to the same overlay network
+- traefik config through commands in the compose, ports 80 and 443 are exposed
+- all services have the necessary labels for configuring websecure redirection
+
+## Task 32-50
+
+#### fluent-bit
+- compose is used to deploy the service on both nodes and mount config files
+- a configuration file is set to:
+  - collect logs from each container and send them to loki
+  - collect metrics with node_exporter and expose them through a http endpoint
+- the config is templated by each node in order to label correctly each log with the source node
+
+#### loki
+- is deployed through compose with default config and simply stores logs
+
+#### prometheus
+- is deployed through compose with flag that set retention time and config file
+- its config file exploits docker socket to collect metrics and relabel them thanks to the labels set in the compose
+
+#### grafana
+- datasources are configured (loki and prometheus)
+- openid is enabled
+
+# Facilities available
 
 - `make run-ansible` runs the Ansible playbook
 - `make run-ansible-lint` runs the Ansible playbook linter
 - An example inside of `examples` of the integration between Nextcloud and Keycloak
 
-## 🔫🔫🔫
-RoyalL, ShottaS, and BiggyL had lent a large sum of money to a man named Docker, and he had failed to pay them back on time. They were fed up with waiting and decided to track him down and confront him about the debts.
-
-They searched high and low, using every resource at their disposal to locate Docker. They scoured the city, asking around and following any leads they could find.
-
-Finally, after weeks of searching, they received a tip that Docker was hiding out in a seedy hotel on the outskirts of town. Determined to get their money back, they headed over to the hotel and burst into Docker's room.
-
-Docker was caught off guard and knew he was no match for the three gangsters. He begged for mercy, promising to pay them back as soon as possible.
-
-RoyalL, ShottaS, and BiggyL considered his plea, but they knew they couldn't trust him. They demanded that he come up with a plan to pay them back immediately, or face the consequences.
-
-Docker agreed, and with the help of the three gangsters, he was able to come up with a repayment plan that satisfied everyone. In the end, RoyalL, ShottaS, and BiggyL got their money back, and Docker learned his lesson about the importance of paying his debts on time.
+# TO-DO
+Listed by priority:
+- keycloak entrypoint modification in order to wait for postgres
+- template secrets
+- join registry-tls-common and registry-login
+- loki for prom endpoint is still necessary?
+- 

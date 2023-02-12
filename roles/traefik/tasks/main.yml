@@ -1,10 +1,4 @@
 ---
-# - name: Create ACME file
-#   ansible.builtin.file:
-#     path: /data/traefik/acme.json
-#     state: touch
-#     mode: '0600'    
-   
 - name: Registering domain names
   ansible.builtin.lineinfile:
     path: "/etc/hosts"

@@ -12,10 +12,7 @@ providers:
   docker:
     exposedByDefault: false
     swarmMode: true
-
-docker:
-  network:
-    - VCC_stack_default
+    network: traefik-public
 
 entryPoints:
   web:
@@ -27,29 +24,7 @@ entryPoints:
     forwardedHeaders:
       insecure: true      
   websecure:
-    address: :443    
-
-http:
-  routers:
-    nextcloud_route:
-      entryPoints:
-        - websecure
-      rule: Host(`cloud.localdomain`)
-      service: VCC_stack_nextcloud
-      tls: true
-      middlewares:
-        - nextcloud_proto
-  middlewares:
-    nextcloud_proto:
-      headers:
-        customrequestheaders:
-          X-Forwarded-Proto: https
-  services:
-    VCC_stack_nextcloud:
-      loadbalancer:
-        server:
-          port: 80
-          scheme: https
+    address: :443
 
 tls:
   stores:

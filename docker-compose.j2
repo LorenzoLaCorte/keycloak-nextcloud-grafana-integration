@@ -3,38 +3,25 @@ services:
   postgres:
     image: postgres:15.1
     environment: 
-      POSTGRES_DB: vcc-test
-      POSTGRES_USER: vcc-test
-      POSTGRES_PASSWORD: vcc-test
+      POSTGRES_DB: {{ POSTGRES_DB_1 }}
+      POSTGRES_USER: {{ POSTGRES_USER_1 }}
+      POSTGRES_PASSWORD: {{ POSTGRES_PASSWORD_1 }}
     volumes:
       - /data/postgresql/data_dir:/var/lib/postgresql/data
       - /data/postgresql/sql:/docker-entrypoint-initdb.d
     networks:
       - traefik-public
     deploy:
-      mode: replicated
-      replicas: 1
       restart_policy:
         condition: on-failure
     labels:
       - "prometheus-job=postgres"
-    ports:
-     - target: 5432
-       published: 5432
 
   keycloak:
-    image: quay.io/keycloak/keycloak:20.0.1
-    command: 
-      - start-dev
-      - --import-realm
-      - --log-level=debug
-      - --log=console,file
-      - --log-file=/logs/keycloak.log
-      - --hostname=auth.localdomain
-      - --hostname-strict-https=false
+    image: 10.255.255.10:5000/keycloak
     environment: 
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN: {{ KEYCLOAK_ADMIN }}
+      KEYCLOAK_ADMIN_PASSWORD: {{ KEYCLOAK_ADMIN_PASSWORD }}
       KC_PROXY_ADDRESS_FORWARDING: "true"
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME: auth.localdomain
@@ -42,18 +29,14 @@ services:
       KC_HTTP_ENABLED: "true"
       KC_DB: postgres 
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak 
-      KC_DB_PASSWORD: keycloak 
-      KC_DB_USERNAME: keycloak
-    depends_on:
-      - postgres
+      KC_DB_PASSWORD: {{ KC_DB_PASSWORD }} 
+      KC_DB_USERNAME: {{ KC_DB_USERNAME }}
     volumes:
       - /data/volumes/keycloak/realm.json:/opt/keycloak/data/import/realm.json
       - /data/logs/keycloak/keycloak.log:/logs/keycloak.log
     networks:
       - traefik-public  
     deploy:
-      mode: replicated
-      replicas: 1
       restart_policy:
         condition: on-failure
       labels:
@@ -71,25 +54,21 @@ services:
   nextcloud:
     image: 10.255.255.10:5000/nextcloud
     environment: 
-      POSTGRES_DB: nextcloud
-      POSTGRES_USER: nextcloud
-      POSTGRES_PASSWORD: nextcloud
+      POSTGRES_DB: {{ POSTGRES_DB_2 }}
+      POSTGRES_USER: {{ POSTGRES_USER_2 }}
+      POSTGRES_PASSWORD: {{ POSTGRES_PASSWORD_2 }}
       POSTGRES_HOST: postgres
-      NEXTCLOUD_ADMIN_USER: admin
-      NEXTCLOUD_ADMIN_PASSWORD: admin
+      NEXTCLOUD_ADMIN_USER: {{ NEXTCLOUD_ADMIN_USER }}
+      NEXTCLOUD_ADMIN_PASSWORD: {{ NEXTCLOUD_ADMIN_PASSWORD }}
     volumes:
       - /data/nextcloud:/var/www/html
       - /data/logs/nextcloud/nextcloud.log:/nextcloud.log
     extra_hosts:
       - "auth.localdomain:192.168.50.10"
       - "cloud.localdomain:192.168.50.10"
-    depends_on:
-      - postgres 
     networks:
       - traefik-public
     deploy:
-      mode: replicated
-      replicas: 1
       restart_policy:
         condition: on-failure
       labels:
@@ -119,8 +98,6 @@ services:
     deploy:
       restart_policy:
         condition: none
-      mode: replicated
-      replicas: 1 
       labels:
         - "prometheus-job=rev-proxy"
 
@@ -213,9 +190,6 @@ services:
       - "--config.file=/config/prometheus.yml"
       - "--storage.tsdb.retention.time=7d"
       - "--log.level=debug"
-    deploy:
-      mode: replicated
-      replicas: 1
 
   grafana:
     image: grafana/grafana:9.3.1
@@ -225,15 +199,23 @@ services:
       - /data/grafana:/var/lib/grafana
       - /data/volumes/grafana:/etc/grafana/provisioning/datasources
     environment:
-      GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
-      GF_AUTH_GENERIC_OAUTH_API_URL: "http://auth.localdomain/realms/internal/protocol/openid-connect/userinfo"
-      GF_AUTH_GENERIC_OAUTH_AUTH_URL: "http://auth.localdomain/realms/internal/protocol/openid-connect/auth"
-      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "grafana"
-      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "pippo"
       GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
+      GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
+      GF_AUTH_GENERIC_OAUTH_SCOPES: openid email profile
+      GF_AUTH_GENERIC_OAUTH_NAME: Oauth
+      GF_AUTH_GENERIC_OAUTH_TLS_SKIP_VERIFY_INSECURE: "true"
+      GF_AUTH_GENERIC_OAUTH_API_URL: "http://auth.localdomain/realms/vcc/protocol/openid-connect/userinfo"
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: "https://auth.localdomain/realms/vcc/protocol/openid-connect/auth"
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "http://auth.localdomain/realms/vcc/protocol/openid-connect/token"     
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "grafana"
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "pippopippo"
       GF_AUTH_GENERIC_OAUTH_NAME: "Keycloak"
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(roles[*], 'Admin') && 'Admin' || contains(roles[*], 'Editor') && 'Editor' || 'Viewer'"
+      GF_SERVER_DOMAIN: "mon.localdomain"
+      GF_SERVER_ROOT_URL: "http://mon.localdomain"
     extra_hosts:
       - "auth.localdomain:192.168.50.10"
+      - "mon.localdomain:192.168.50.10"
     deploy:
       labels:
         - "traefik.enable=true"

@@ -5,13 +5,13 @@
   "enabled":true,
   "clients": [
     { 
-      "id": "nextcloud",
-      "clientId": "nextcloud",
+      "id": "{{ CLOUD_OIDC_CLIENT_ID }}",
+      "clientId": "{{ CLOUD_OIDC_CLIENT_ID }}",
       "description": "Integration with Nextcloud",
       "publicClient": false,
       "redirectUris": ["*"],
       "enabled": true,
-      "secret": "pippo"
+      "secret": "{{ CLOUD_OIDC_CLIENT_SECRET }}"
     },
     { 
       "id": "grafana",
@@ -20,9 +20,22 @@
       "publicClient": false,
       "redirectUris": ["*"],
       "enabled": true,
-      "secret": "pippo"
+      "secret": "pippopippo"
     }  
   ],
+  "roles": {
+    "realm": [
+      {
+        "name": "Admin"
+      },
+      {
+        "name": "Viewer"
+      },
+      {
+        "name": "Editor"
+      }
+    ]
+  },
   "users": [
     {
       "id": "examiner",
@@ -37,6 +50,9 @@
           "type": "rawPassword",
           "value": "itsdifficult"
         }
+      ],
+      "realmRoles": [
+          "Admin"
       ]
     }]
 }

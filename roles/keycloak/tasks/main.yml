@@ -1,2 +1,20 @@
 ---
-    
+- name: Erase keycloak image in order to re-execute entrypoint
+  community.docker.docker_image:
+    build:
+      path: "{{playbook_dir}}/volumes/keycloak/container/"
+      nocache: true
+    name: 10.255.255.10:5000/keycloak
+    source: build
+    state: absent
+    force_absent: true
+
+- name: Build an image and push it to a private repo
+  community.docker.docker_image:
+    build:
+      path: "{{playbook_dir}}/volumes/keycloak/container/"
+      nocache: true
+    name: 10.255.255.10:5000/keycloak
+    push: true
+    source: build
+    debug: true

@@ -11,7 +11,7 @@
     - "/data/loki"
     - "/data/prometheus"
     - "/data/grafana"
-    - "/data/volumes/"
+    - "/data/volumes"
 
 - name: Create file needed for keycloak logging
   ansible.builtin.file:
@@ -26,4 +26,10 @@
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/volumes/"
     dest: /data/volumes/
+    mode: '0777'
+
+- name: "Render realm.json file using variables"
+  template:
+    src: "/data/volumes/keycloak/realm.j2"
+    dest: "/data/volumes/keycloak/realm.json"
     mode: '0777'

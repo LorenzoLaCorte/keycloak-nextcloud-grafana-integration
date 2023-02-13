@@ -189,7 +189,7 @@ services:
     command:
       - "--config.file=/config/prometheus.yml"
       - "--storage.tsdb.retention.time=7d"
-      - "--log.level=debug"
+      - "--log.level=info"
 
   grafana:
     image: grafana/grafana:9.3.1
@@ -197,7 +197,9 @@ services:
       - traefik-public
     volumes:
       - /data/grafana:/var/lib/grafana
-      - /data/volumes/grafana:/etc/grafana/provisioning/datasources
+      - /data/volumes/grafana/datasources:/etc/grafana/provisioning/datasources
+      - /data/volumes/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - /data/volumes/grafana/dashboards_dir:/var/lib/grafana/dashboards
     environment:
       GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
       GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"

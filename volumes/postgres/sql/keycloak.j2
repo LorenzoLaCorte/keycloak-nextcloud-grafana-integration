@@ -1,0 +1,4 @@
+-- Create a user with a password
+CREATE USER keycloak WITH PASSWORD '{{ KC_DB_PASSWORD }}';
+-- Create a database
+CREATE DATABASE {{ KC_DB_NAME }} WITH OWNER = {{ KC_DB_USERNAME }};

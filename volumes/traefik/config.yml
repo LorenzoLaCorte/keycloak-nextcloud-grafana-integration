@@ -12,7 +12,7 @@ providers:
   docker:
     exposedByDefault: false
     swarmMode: true
-    network: traefik-public
+    network: VCC_stack_default
 
 entryPoints:
   web:

@@ -14,13 +14,13 @@
       "secret": "{{ CLOUD_OIDC_CLIENT_SECRET }}"
     },
     { 
-      "id": "grafana",
-      "clientId": "grafana",
+      "id": "{{ MON_OIDC_CLIENT_ID }}",
+      "clientId": "{{ MON_OIDC_CLIENT_ID }}",
       "description": "Integration with Grafana",
       "publicClient": false,
       "redirectUris": ["*"],
       "enabled": true,
-      "secret": "pippopippo"
+      "secret": "{{ MON_OIDC_CLIENT_SECRET }}"
     }  
   ],
   "roles": {
@@ -38,21 +38,21 @@
   },
   "users": [
     {
-      "id": "examiner",
-      "username": "vcc-examiner",
-      "firstName": "VCC",
-      "lastName": "Examiner",
-      "email": "vcc.examiner@bots.dibris.unige.it",
+      "id": "{{ USER_ID }}",
+      "username": "{{ USER_USERNAME }}",
+      "firstName": "{{ USER_FIRSTNAME }}",
+      "lastName": "{{ USER_LASTNAME }}",
+      "email": "{{ USER_EMAIL }}",
       "emailVerified": true,
       "enabled": true,
       "credentials": [
         {
           "type": "rawPassword",
-          "value": "itsdifficult"
+          "value": "{{ USER_PASS }}"
         }
       ],
       "realmRoles": [
-          "Admin"
+          "Viewer"
       ]
     }]
 }

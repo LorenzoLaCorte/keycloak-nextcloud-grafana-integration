@@ -11,12 +11,14 @@
     - "{{ postgres_data_dir }}"
     - "{{ postgres_scripts_dir }}"  
 
-- name: Copy initial scripts into NFS dir
-  ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: "{{ postgres_scripts_dir }}"
-    follow: yes
+- name: "Render keycloak.sql with secrets"
+  template:
+    src: "{{ playbook_dir }}/volumes/postgres/sql/keycloak.j2"
+    dest: "{{ postgres_scripts_dir }}/keycloak.sql"
     mode: '0755'
-  with_items:
-    - "{{ playbook_dir }}/examples/postgres/sql/keycloak.sql"
-    - "{{ playbook_dir }}/examples/postgres/sql/nextcloud.sql"
+
+- name: "Render nextcloud.sql with secrets"
+  template:
+    src: "{{ playbook_dir }}/volumes/postgres/sql/nextcloud.j2"
+    dest: "{{ postgres_scripts_dir }}/nextcloud.sql"
+    mode: '0755'

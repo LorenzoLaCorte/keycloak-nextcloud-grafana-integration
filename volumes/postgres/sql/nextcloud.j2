@@ -1,0 +1,4 @@
+-- Create a user with a password
+CREATE USER {{ CLOUD_DB_USER }} WITH PASSWORD '{{ CLOUD_DB_PASSWORD }}';
+-- Create a database
+CREATE DATABASE {{ CLOUD_DB_NAME }} WITH OWNER = {{ CLOUD_DB_USER }};

@@ -1,15 +1,5 @@
 #!/bin/sh
 
-NEXTCLOUD_CONTAINER_NAME=VCC_stack_nextcloud
-KEYCLOAK_CONTAINER_NAME=VCC_stack_keycloak
-KEYCLOAK_ADMIN_USER=admin
-KEYCLOAK_ADMIN_PASSWORD=admin
-SAMPLE_USER_PASSWORD=itsdifficult
-OIDC_CLIENT_ID=nextcloud 
-OIDC_PROVIDER_URL=https://auth.localdomain/realms/vcc/
-OIDC_LOGOUT_URL=https://cloud.localdomain/apps/oidc_login/oidc
-OIDC_CLIENT_SECRET=pippo
-
 # Wait until Keycloak is alive
 until curl -sSf http://keycloak:8080; do
     sleep 1
@@ -27,23 +17,11 @@ until [ $res -eq 0 ]; do
 done
 echo "Nextcloud setup done"
 
-#chown root /var/www/html/config/config.php
-
 #
 # Helper functions
 
-run_as() {
-    if [ "$(id -u)" = 0 ]; then
-        su -p "$user" -s /bin/sh -c "$1"
-    else
-        sh -c "$1"
-    fi
-}
-
 # Nextcloud
 runOCC() {
-    #echo "Current user: $user"
-    #run_as "php /var/www/html/occ '$@'"
     sudo -E -u www-data php occ "$@"
 }
 setBoolean() { runOCC config:system:set --value="$2" --type=boolean -- "$1"; }
@@ -96,7 +74,5 @@ setString overwrite.cli.url "https://cloud.localdomain"
 runOCC config:system:set --value=preferred_username --type=string -- oidc_login_attributes id
 runOCC config:system:set --value=email --type=string -- oidc_login_attributes mail
 setBoolean config_is_read_only true
-
-#chown www-data config/config.php
 
 tail -f /var/www/html/nextcloud.log

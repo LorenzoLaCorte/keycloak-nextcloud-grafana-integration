@@ -3,12 +3,12 @@ services:
   postgres:
     image: postgres:15.1
     environment: 
-      POSTGRES_DB: {{ POSTGRES_DB_1 }}
-      POSTGRES_USER: {{ POSTGRES_USER_1 }}
-      POSTGRES_PASSWORD: {{ POSTGRES_PASSWORD_1 }}
+      POSTGRES_DB: {{ POSTGRES_DB }}
+      POSTGRES_USER: {{ POSTGRES_USER }}
+      POSTGRES_PASSWORD: {{ POSTGRES_PASSWORD }}
     volumes:
-      - /data/postgresql/data_dir:/var/lib/postgresql/data
-      - /data/postgresql/sql:/docker-entrypoint-initdb.d
+      - /data/volumes/postgresql/data_dir:/var/lib/postgresql/data
+      - /data/volumes/postgresql/sql:/docker-entrypoint-initdb.d
     networks:
       - traefik-public
     deploy:
@@ -29,8 +29,8 @@ services:
       KC_HTTP_ENABLED: "true"
       KC_DB: postgres 
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak 
-      KC_DB_PASSWORD: {{ KC_DB_PASSWORD }} 
       KC_DB_USERNAME: {{ KC_DB_USERNAME }}
+      KC_DB_PASSWORD: {{ KC_DB_PASSWORD }}
     volumes:
       - /data/volumes/keycloak/realm.json:/opt/keycloak/data/import/realm.json
       - /data/logs/keycloak/keycloak.log:/logs/keycloak.log
@@ -54,12 +54,16 @@ services:
   nextcloud:
     image: 10.255.255.10:5000/nextcloud
     environment: 
-      POSTGRES_DB: {{ POSTGRES_DB_2 }}
-      POSTGRES_USER: {{ POSTGRES_USER_2 }}
-      POSTGRES_PASSWORD: {{ POSTGRES_PASSWORD_2 }}
+      POSTGRES_DB: {{ CLOUD_DB_NAME }}
+      POSTGRES_USER: {{ CLOUD_DB_USER }}
+      POSTGRES_PASSWORD: {{ CLOUD_DB_PASSWORD }}
       POSTGRES_HOST: postgres
       NEXTCLOUD_ADMIN_USER: {{ NEXTCLOUD_ADMIN_USER }}
       NEXTCLOUD_ADMIN_PASSWORD: {{ NEXTCLOUD_ADMIN_PASSWORD }}
+      OIDC_CLIENT_ID: {{ CLOUD_OIDC_CLIENT_ID }} 
+      OIDC_CLIENT_SECRET: {{ CLOUD_OIDC_CLIENT_SECRET }}
+      OIDC_PROVIDER_URL: https://auth.localdomain/realms/vcc/
+      OIDC_LOGOUT_URL: https://cloud.localdomain/apps/oidc_login/oidc
     volumes:
       - /data/nextcloud:/var/www/html
       - /data/logs/nextcloud/nextcloud.log:/nextcloud.log
@@ -105,6 +109,8 @@ services:
     image: traefik:v2.9.6
     hostname: traefik
     volumes:
+      # - /data/volumes/traefik:/etc/traefik
+      # - /data/docker-registry/certs:/etc/ssl/traefik/
       - /data/certs:/etc/ssl/traefik
       - /data/traefik:/etc/traefik/dynamic
       - /data/logs/traefik:/logs/
@@ -112,19 +118,13 @@ services:
     networks:
       - traefik-public
     ports:
-      # HTTP port
-      - target: 80
-        published: 80
-        mode: host
-      - target: 443
-        published: 443
-        mode: host
-      #  Web UI (enabled by --api.insecure=true)
+      - 80:80
+      - 443:443
       - 6880:8080
     depends_on:
       - reverse-proxy-https-init
     command:
-    # enable Web UI
+      # enable Web UI
       - --api.insecure=true
       # set provider (Docker Swarm)
       - --providers.docker
@@ -143,8 +143,6 @@ services:
       - "--accesslog.filePath=/logs/access.log"
       - --log.level=DEBUG
     deploy:
-      mode: replicated
-      replicas: 1
       placement:
         constraints:
           - node.role == manager
@@ -209,8 +207,8 @@ services:
       GF_AUTH_GENERIC_OAUTH_API_URL: "http://auth.localdomain/realms/vcc/protocol/openid-connect/userinfo"
       GF_AUTH_GENERIC_OAUTH_AUTH_URL: "https://auth.localdomain/realms/vcc/protocol/openid-connect/auth"
       GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "http://auth.localdomain/realms/vcc/protocol/openid-connect/token"     
-      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "grafana"
-      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "pippopippo"
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "{{ MON_OIDC_CLIENT_ID }}"
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "{{ MON_OIDC_CLIENT_SECRET }}"
       GF_AUTH_GENERIC_OAUTH_NAME: "Keycloak"
       GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(roles[*], 'Admin') && 'Admin' || contains(roles[*], 'Editor') && 'Editor' || 'Viewer'"
       GF_SERVER_DOMAIN: "mon.localdomain"

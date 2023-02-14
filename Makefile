@@ -99,6 +99,7 @@ SERVICES := \
 	VCC_stack_reverse-proxy-https-init \
 	VCC_stack_fluent-bit \
 	VCC_stack_loki \
+	VCC_stack_cadvisor \
 	VCC_stack_prometheus \
 	VCC_stack_grafana
 

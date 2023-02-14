@@ -31,3 +31,9 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets: ["192.168.50.20:9323"]
+
+  - job_name: 'node'
+    scheme: http
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["192.168.50.10:9323, 192.168.50.20:9323"]

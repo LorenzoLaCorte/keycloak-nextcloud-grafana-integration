@@ -33,8 +33,8 @@ tls:
   stores:
     default:
       defaultCertificate:
-        certFile: /etc/ssl/traefik/server.crt
-        keyFile: /etc/ssl/traefik/server.key
+        certFile: /data/certs/server.crt
+        keyFile: /data/certs/server.key
   certificates:
     - certFile: /etc/ssl/traefik/server.crt
       keyFile: /etc/ssl/traefik/server.key

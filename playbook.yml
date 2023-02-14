@@ -40,7 +40,7 @@
   hosts: nfs-servers
   become: true
   roles:
-    # - traefik
+    - traefik
 
 - name: Prepare Database and Nextcloud
   hosts: nfs-servers

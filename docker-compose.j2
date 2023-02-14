@@ -94,6 +94,9 @@ services:
      SSL_O: "VCC"
      SSL_C: "IT"
      SSL_DAYS: 3650
+    volumes:
+      - /data/certs:/etc/ssl/traefik
+      - /data/traefik:/etc/traefik/dynamic
     networks:
       - traefik-public
     deploy:
@@ -106,10 +109,11 @@ services:
     image: traefik:v2.9.6
     hostname: traefik
     volumes:
+      # - /data/volumes/traefik:/etc/traefik
+      # - /data/docker-registry/certs:/etc/ssl/traefik/
       - /data/certs:/etc/ssl/traefik
-      - /data/volumes/traefik:/etc/traefik
       - /data/traefik:/etc/traefik/dynamic
-      - /data/logs/traefik:/var/log/traefik
+      - /data/logs/traefik:/logs/
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - traefik-public
@@ -119,6 +123,25 @@ services:
       - 6880:8080
     depends_on:
       - reverse-proxy-https-init
+    command:
+      # enable Web UI
+      - --api.insecure=true
+      # set provider (Docker Swarm)
+      - --providers.docker
+      - --providers.docker.swarmMode=true
+      - --providers.docker.network=VCC_stack_default
+      # traefik http entrypoint port
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      # add x-forwaded-for
+      - --entrypoints.web.forwardedHeaders.insecure=true
+      # manually enable services exposed by traefik
+      - --providers.docker.exposedByDefault=false
+      - "--log.filePath=/logs/traefik.log"
+      - --accesslog=true
+      - "--accesslog.filePath=/logs/access.log"
+      - --log.level=DEBUG
     deploy:
       placement:
         constraints:
@@ -136,6 +159,8 @@ services:
       - /volumes/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
       - /data/volumes/fluent-bit/parsers.conf:/parsers.conf
       - /var/lib/docker/containers:/var/lib/docker/containers
+      - /proc:/host/proc
+      - /sys:/host/sys
     deploy:
       mode: global
       labels:
@@ -153,6 +178,19 @@ services:
       labels:
         - "prometheus-job=loki"
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: global
+      labels:
+        - "prometheus-job=cadvisor"
+    
   prometheus:
     image: prom/prometheus:v2.40.6
     volumes:
@@ -165,6 +203,8 @@ services:
       - "--config.file=/config/prometheus.yml"
       - "--storage.tsdb.retention.time=7d"
       - "--log.level=info"
+    depends_on:
+      - cadvisor
     user: 65534:120
     deploy:
       placement:

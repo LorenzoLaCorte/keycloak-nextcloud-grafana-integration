@@ -7,8 +7,8 @@ test -z $SSL_DAYS && SSL_DAYS=3650
 if [ ! -e /ssl/server.key ]; then
     echo "Generating self-signed certificate"
     openssl req -subj "/CN=$SSL_CN/O=$SSL_O/C=$SSL_C" \
-     -new -newkey rsa:2048 -days $SSL_DAYS -nodes -x509 -keyout /etc/ssl/traefik/server.key \
-     -out /etc/ssl/traefik/server.crt
+     -new -newkey rsa:2048 -days $SSL_DAYS -nodes -x509 -keyout /data/certs/server.key \
+     -out /data/certs/server.crt
 
 echo "
 tls:

@@ -1,5 +1,5 @@
 ---
-- name: Create file to specify untrusted registry
+- name: Create or modify docker daemon
   copy:
     dest: "{{ daemon_file }}"
     content: |

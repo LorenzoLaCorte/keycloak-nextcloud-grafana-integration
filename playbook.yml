@@ -26,7 +26,8 @@
   roles:
     # - registry-tls-common
     # - registry-login
-    
+    - prometheus-common
+
 - name: Prepare all files for the stack
   hosts: nfs-servers
   become: true
@@ -39,7 +40,7 @@
   hosts: nfs-servers
   become: true
   roles:
-    - traefik
+    # - traefik
 
 - name: Prepare Database and Nextcloud
   hosts: nfs-servers
@@ -55,7 +56,7 @@
   hosts: all
   become: true
   roles:
-    # - logging
+    - logging
 
 - name: Deploy all services
   hosts: nfs-servers

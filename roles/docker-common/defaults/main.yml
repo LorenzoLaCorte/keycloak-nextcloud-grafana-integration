@@ -1,3 +1,0 @@
----
-untrusted_registry_file: /etc/docker/daemon.json
-untrusted_registry_content: "{ \"insecure-registries\": [\"10.255.255.10:5000\"] }"

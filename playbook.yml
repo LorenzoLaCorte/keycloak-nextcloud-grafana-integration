@@ -39,7 +39,7 @@
   hosts: nfs-servers
   become: true
   roles:
-    # - traefik
+    - traefik
 
 - name: Prepare Database and Nextcloud
   hosts: nfs-servers
@@ -47,9 +47,9 @@
   vars_files:
     - "{{ playbook_dir }}/secrets/secrets.yml"
   roles:
-    - database
-    - keycloak
-    - nextcloud
+    # - database
+    # - keycloak
+    # - nextcloud
 
 - name: Prepare Logging
   hosts: all

@@ -1,0 +1,47 @@
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+
+log:
+  level: DEBUG
+  format: json
+  filePath: /var/log/traefik/traefik.log
+
+accesslog:
+  format: json
+  filePath: /var/log/traefik/access.log
+
+api:
+  dashboard: true 
+  insecure: true  
+
+entryPoints:
+  web:
+    address: :80
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+    forwardedHeaders:
+      insecure: true
+
+  websecure:
+    address: :443
+
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/ssl/traefik/server.crt
+        keyFile: /etc/ssl/traefik/server.key
+  certificates:
+    - certFile: /etc/ssl/traefik/server.crt
+      keyFile: /etc/ssl/traefik/server.key
+
+providers:
+  docker:
+    exposedByDefault: false 
+    swarmMode: true
+  file:
+    directory: /etc/traefik

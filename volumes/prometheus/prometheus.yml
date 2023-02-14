@@ -20,20 +20,9 @@ scrape_configs:
       - source_labels: [__meta_dockerswarm_service_label_prometheus_job]
         target_label: job
 
-  - job_name: 'node1 exporter'
-    scheme: http
+  - job_name: node
     metrics_path: /metrics
     static_configs:
-      - targets: ["192.168.50.10:9323"]
-
-  - job_name: 'node2 exporter'
-    scheme: http
-    metrics_path: /metrics
-    static_configs:
-      - targets: ["192.168.50.20:9323"]
-
-  - job_name: 'node'
-    scheme: http
-    metrics_path: /metrics
-    static_configs:
-      - targets: ["192.168.50.10:9323, 192.168.50.20:9323"]
+      - targets: 
+        - 192.168.50.10:2021
+        - 192.168.50.20:2021

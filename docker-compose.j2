@@ -155,6 +155,7 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers
       - /proc:/host/proc
       - /sys:/host/sys
+      - /:/rootfs:ro 
     deploy:
       mode: global
 

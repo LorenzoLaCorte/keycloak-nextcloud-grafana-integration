@@ -153,9 +153,12 @@ services:
       - /volumes/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
       - /data/volumes/fluent-bit/parsers.conf:/parsers.conf
       - /var/lib/docker/containers:/var/lib/docker/containers
+      - /var/log/journal:/run/log/journal:ro
+      - /run/systemd/journal:/run/systemd/journal:ro
+      - /var/run/systemd/journal:/var/run/systemd/journal:ro
       - /proc:/host/proc
       - /sys:/host/sys
-      - /:/rootfs:ro 
+      - /:/rootfs:ro
     deploy:
       mode: global
 

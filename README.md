@@ -155,4 +155,3 @@ Listed by priority:
 - template secrets
 - join registry-tls-common and registry-login
 - loki for prom endpoint is still necessary?
-- 

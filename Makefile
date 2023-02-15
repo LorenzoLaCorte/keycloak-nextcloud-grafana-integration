@@ -147,3 +147,10 @@ ifndef id
 	$(error Please set container id)
 endif
 	sudo docker logs $(id) 2>&1 | more
+
+.PHONY: exec_fluent
+exec_fluent:
+ifndef cmd
+	$(error Please enter command)
+endif
+	sudo docker run --rm -it fluent/fluent-bit:1.8.12-debug /fluent-bit/bin/fluent-bit -i exec -p 'command=$(cmd)' -o stdout

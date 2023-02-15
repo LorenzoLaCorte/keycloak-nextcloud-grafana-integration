@@ -22,25 +22,31 @@
 
 [INPUT]
    Name              systemd
-   Tag               logs
-   Systemd_Filter    _SYSTEMD_UNIT=docker.service
+   Tag               system_logs
    
 [FILTER]
-   Name     parser
-   Match    logs
-   Key_Name *
-   Parser   json
+   Name              parser
+   Match             logs
+   Key_Name          *
+   Parser            json
 
 [OUTPUT]
-   name            loki
-   match           logs
-   host            loki.hostname
-   port            3100
-   labels          job=docker-logs, host={{ inventory_hostname }}
+   name              loki
+   match             logs
+   host              loki.hostname
+   port              3100
+   labels            job=docker-logs, host={{ inventory_hostname }}
 
 [OUTPUT]
-   name            prometheus_exporter
-   match           node_metrics
-   host            0.0.0.0  
-   port            2021
-   add_label       host {{ inventory_hostname }}
+   name              loki
+   match             system_logs
+   host              loki.hostname
+   port              3100
+   labels            job=system-logs
+
+[OUTPUT]
+   name              prometheus_exporter
+   match             node_metrics
+   host              0.0.0.0  
+   port              2021
+   add_label         host {{ inventory_hostname }}

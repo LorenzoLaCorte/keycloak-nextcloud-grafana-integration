@@ -14,7 +14,7 @@
     path: "{{ certs_dir }}/domain.csr"
     privatekey_path: "{{ certs_dir }}/privkey.pem"
     common_name: myregistry.domain.com
-    subject_alt_name: "IP:10.255.255.10" 
+    subject_alt_name: "IP:{{ registry_url }}" 
 
 - name: Generate a Self Signed OpenSSL certificate.
   openssl_certificate:
@@ -81,8 +81,8 @@
       constraints:
         - node.role == manager
     publish:
-      - published_port: 5000
-        target_port: 5000
+      - published_port: "{{ registry_port }}"
+        target_port: "{{ registry_port }}"
     mounts:
       - source: "{{ playbook_dir }}/volumes/config/config.yml"
         target: /etc/docker/registry/config.yml

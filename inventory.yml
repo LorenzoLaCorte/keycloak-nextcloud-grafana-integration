@@ -31,3 +31,5 @@ all:
         nfs-servers:
       vars:
         nfs_share_path: /data
+        registry_url: 10.255.255.10
+        registry_port: 5000

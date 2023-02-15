@@ -82,31 +82,13 @@ services:
         - "traefik.http.routers.nextcloud_route.middlewares=VCC_stack_nextcloud_proto"
         - "traefik.http.services.VCC_stack_nextcloud.loadbalancer.server.port=80"
         - "traefik.http.middlewares.VCC_stack_nextcloud_proto.headers.customrequestheaders.X-Forwarded-Proto=https" 
-  
-  reverse-proxy-https-init:
-    image: 10.255.255.10:5000/rev-proxy
-    environment: 
-     SSL_CN: "*.local"
-     SSL_O: "VCC"
-     SSL_C: "IT"
-     SSL_DAYS: 3650
-    volumes:
-      - /data/certs:/etc/ssl/traefik
-      - /data/traefik:/etc/traefik/dynamic
-    networks:
-      - traefik-public
-    deploy:
-      restart_policy:
-        condition: none
 
   traefik:
     image: traefik:v2.9.6
     hostname: traefik
     volumes:
-      # - /data/volumes/traefik:/etc/traefik
-      # - /data/docker-registry/certs:/etc/ssl/traefik/
-      - /data/certs:/etc/ssl/traefik
-      - /data/traefik:/etc/traefik/dynamic
+      - /data/volumes/traefik:/etc/traefik
+      - /data/volumes/traefik/certs:/etc/ssl/traefik
       - /data/logs/traefik:/logs/
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
@@ -115,27 +97,6 @@ services:
       - 80:80
       - 443:443
       - 6880:8080
-    depends_on:
-      - reverse-proxy-https-init
-    command:
-      # enable Web UI
-      - --api.insecure=true
-      # set provider (Docker Swarm)
-      - --providers.docker
-      - --providers.docker.swarmMode=true
-      - --providers.docker.network=VCC_stack_default
-      # traefik http entrypoint port
-      - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      - --entrypoints.web.http.redirections.entryPoint.to=websecure
-      # add x-forwaded-for
-      - --entrypoints.web.forwardedHeaders.insecure=true
-      # manually enable services exposed by traefik
-      - --providers.docker.exposedByDefault=false
-      - "--log.filePath=/logs/traefik.log"
-      - --accesslog=true
-      - "--accesslog.filePath=/logs/access.log"
-      - --log.level=DEBUG
     deploy:
       placement:
         constraints:
@@ -147,8 +108,6 @@ services:
       LOKI_URL: http://loki:3100/loki/api/v1/push
     networks:
       - traefik-public
-    ports:
-      - 2021:2021
     volumes:
       - /volumes/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
       - /data/volumes/fluent-bit/parsers.conf:/parsers.conf

@@ -4,9 +4,15 @@
     user_psw: "{{ lookup('file', '{{ psw_file }}').splitlines() | first }}"
   register: file_content 
 
+- name: Wait for port 5000 to become open on the host
+  ansible.builtin.wait_for:
+    host: "{{ registry_url }}"
+    port: "{{ registry_port }}"
+    delay: 2
+
 - name: Log into private registry with TLS and client certificates
   community.docker.docker_login:
-    registry_url: https://10.255.255.10:5000
+    registry_url: "https://{{ registry_url }}:{{ registry_port }}"
     tls: yes
     ca_cert: /data/docker-registry/certs/fullchain.pem
     client_cert: /data/docker-registry/certs/fullchain.pem
@@ -16,4 +22,3 @@
     tls_hostname: myregistry.domain.com
     reauthorize: true
     validate_certs: true
-    

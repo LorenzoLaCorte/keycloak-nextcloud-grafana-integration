@@ -16,7 +16,7 @@ services:
         condition: on-failure
 
   keycloak:
-    image: 10.255.255.10:5000/keycloak
+    image: {{ registry_url }}:{{ registry_port }}/keycloak
     environment: 
       KEYCLOAK_ADMIN: {{ KEYCLOAK_ADMIN }}
       KEYCLOAK_ADMIN_PASSWORD: {{ KEYCLOAK_ADMIN_PASSWORD }}
@@ -49,7 +49,7 @@ services:
         - "traefik.http.middlewares.VCC_stack_keycloak_proto.headers.customrequestheaders.X-Forwarded-Proto=https" 
 
   nextcloud:
-    image: 10.255.255.10:5000/nextcloud
+    image: {{ registry_url }}:{{ registry_port }}/nextcloud
     environment: 
       POSTGRES_DB: {{ CLOUD_DB_NAME }}
       POSTGRES_USER: {{ CLOUD_DB_USER }}
@@ -65,8 +65,8 @@ services:
       - /data/nextcloud:/var/www/html
       - /data/logs/nextcloud/nextcloud.log:/nextcloud.log
     extra_hosts:
-      - "auth.localdomain:192.168.50.10"
-      - "cloud.localdomain:192.168.50.10"
+      - "auth.localdomain:{{ traefik_addr }}"
+      - "cloud.localdomain:{{ traefik_addr }}"
     networks:
       - traefik-public
     deploy:
@@ -108,6 +108,8 @@ services:
       LOKI_URL: http://loki:3100/loki/api/v1/push
     networks:
       - traefik-public
+    ports:
+      - 2021:2021
     volumes:
       - /volumes/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
       - /data/volumes/fluent-bit/parsers.conf:/parsers.conf
@@ -138,6 +140,10 @@ services:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 8080:8080
+    networks:
+      - traefik-public
     deploy:
       mode: global
       labels:
@@ -188,8 +194,8 @@ services:
       GF_SERVER_DOMAIN: "mon.localdomain"
       GF_SERVER_ROOT_URL: "http://mon.localdomain"
     extra_hosts:
-      - "auth.localdomain:192.168.50.10"
-      - "mon.localdomain:192.168.50.10"
+      - "auth.localdomain:{{ traefik_addr }}"
+      - "mon.localdomain:{{ traefik_addr }}"
     deploy:
       labels:
         - "traefik.enable=true"

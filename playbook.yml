@@ -5,6 +5,14 @@
   roles:
     - docker
 
+- name: Prepare all files for the stack
+  hosts: nfs-servers
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/my_secrets/secrets.yml"
+  roles:
+    - prepare_stack
+  
 - name: NFS server, Swarm cluster and registry init
   hosts: nfs-servers
   become: true
@@ -27,14 +35,6 @@
     - registry-tls-common
     - registry-login
     - prometheus-common
-
-- name: Prepare all files for the stack
-  hosts: nfs-servers
-  become: true
-  vars_files:
-    - "{{ playbook_dir }}/my_secrets/secrets.yml"
-  roles:
-    - prepare_stack
 
 - name: Traefik setup
   hosts: nfs-servers

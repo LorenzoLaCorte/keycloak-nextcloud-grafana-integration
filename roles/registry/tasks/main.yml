@@ -84,14 +84,12 @@
       - published_port: "{{ registry_port }}"
         target_port: "{{ registry_port }}"
     mounts:
-      - source: "{{ playbook_dir }}/volumes/config/config.yml"
+      - source: "/data/volumes/registry/config.yml"
         target: /etc/docker/registry/config.yml
         type: bind
-
       - source: /data/docker-registry
         target: /docker-registry
         type: bind
-
       - source: /data/docker-registry/certs
         target: /certs
         type: bind

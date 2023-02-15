@@ -33,3 +33,9 @@
     src: "/data/volumes/keycloak/realm.j2"
     dest: "/data/volumes/keycloak/realm.json"
     mode: '0777'
+
+- name: "Render prometheus.yml file using variables"
+  template:
+    src: "/data/volumes/prometheus/prometheus.j2"
+    dest: "/data/volumes/prometheus/prometheus.yml"
+    mode: '0777'

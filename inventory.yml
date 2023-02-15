@@ -31,5 +31,7 @@ all:
         nfs-servers:
       vars:
         nfs_share_path: /data
+        shared_volumes: /data/volumes
         registry_url: 10.255.255.10
         registry_port: 5000
+        traefik_addr: 192.168.50.10

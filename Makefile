@@ -96,7 +96,6 @@ SERVICES := \
 	VCC_stack_keycloak \
 	VCC_stack_nextcloud \
 	VCC_stack_traefik \
-	VCC_stack_reverse-proxy-https-init \
 	VCC_stack_fluent-bit \
 	VCC_stack_loki \
 	VCC_stack_cadvisor \
@@ -120,17 +119,12 @@ logs:
 	sudo chmod -R 777 ./logs ; \
 	sudo docker service ls > logs/logs.txt ; \
 	sudo docker service ps --no-trunc $(SERVICES) >> logs/logs.txt ; 
-# for service in $(SERVICES) ; do \
-		sudo docker service logs -f $$service >> logs/logs.txt ; \
-	done
 
 .PHONY: enter
 enter:
 ifndef id
 	$(error Please set container id)
 endif
-# sudo docker ps -aqf "name=$(id)"
-# docker exec -it $(docker container ls | grep $(name) | awk '{print $1}') /bin/bash
 	sudo docker exec -it $(id) /bin/sh
 
 .PHONY: up

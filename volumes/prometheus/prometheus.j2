@@ -20,9 +20,16 @@ scrape_configs:
       - source_labels: [__meta_dockerswarm_service_label_prometheus_job]
         target_label: job
 
+  - job_name: cadvisor-nodes
+    metrics_path: /metrics
+    static_configs:
+      - targets: 
+        - "{{ hostvars[groups['nfs-servers'][0]]['ansible_host'] }}:8080"
+        - "{{ hostvars[groups['nfs-clients'][0]]['ansible_host'] }}:8080"
+
   - job_name: node
     metrics_path: /metrics
     static_configs:
       - targets: 
-        - 192.168.50.10:2021
-        - 192.168.50.20:2021
+        - "{{ hostvars[groups['nfs-servers'][0]]['ansible_host'] }}:2021"
+        - "{{ hostvars[groups['nfs-clients'][0]]['ansible_host'] }}:2021"

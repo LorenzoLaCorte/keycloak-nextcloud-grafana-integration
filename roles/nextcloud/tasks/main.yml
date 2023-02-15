@@ -10,7 +10,7 @@
     build:
       path: "/data/volumes/nextcloud/container/"
       nocache: true
-    name: 10.255.255.10:5000/nextcloud
+    name: "{{ registry_url }}:{{ registry_port }}/nextcloud"
     source: build
     state: absent
     force_absent: true
@@ -20,7 +20,7 @@
     build:
       path: "/data/volumes/nextcloud/container/"
       nocache: true
-    name: 10.255.255.10:5000/nextcloud
+    name: "{{ registry_url }}:{{ registry_port }}/nextcloud"
     push: true
     source: build
     debug: true

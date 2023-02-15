@@ -4,7 +4,7 @@
     build:
       path: "/data/volumes/keycloak/container/"
       nocache: true
-    name: 10.255.255.10:5000/keycloak
+    name: "{{ registry_url }}:{{ registry_port }}/keycloak"
     source: build
     state: absent
     force_absent: true
@@ -14,7 +14,7 @@
     build:
       path: "/data/volumes/keycloak/container/"
       nocache: true
-    name: 10.255.255.10:5000/keycloak
+    name: "{{ registry_url }}:{{ registry_port }}/keycloak"
     push: true
     source: build
     debug: true

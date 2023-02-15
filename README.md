@@ -109,6 +109,7 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 - *--import-realm* is used to import a config .json file automatically from the default folder
 - some other flags are used to enable logging and rev-proxy integration
 - the .json file is used to easily configure realm, clients and users
+- keycloak entrypoint modification in order to wait for postgres
 
 #### nextcloud and integration, sto maledetto
 - a custom image is build starting from the one given:
@@ -143,6 +144,9 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 - datasources are configured (loki and prometheus)
 - openid is enabled
 
+## Others
+- templated secrets
+
 # Facilities available
 
 - `make run-ansible` runs the Ansible playbook
@@ -151,7 +155,7 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 
 # TO-DO
 Listed by priority:
-- keycloak entrypoint modification in order to wait for postgres
-- template secrets
+- bug fix in logs dashboard
+- add systemd logs to logs dashboard
+- cadvisor
 - join registry-tls-common and registry-login
-- loki for prom endpoint is still necessary?

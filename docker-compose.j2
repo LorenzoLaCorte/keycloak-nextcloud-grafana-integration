@@ -7,8 +7,8 @@ services:
       POSTGRES_USER: {{ POSTGRES_USER }}
       POSTGRES_PASSWORD: {{ POSTGRES_PASSWORD }}
     volumes:
-      - /data/volumes/postgresql/data_dir:/var/lib/postgresql/data
-      - /data/volumes/postgresql/sql:/docker-entrypoint-initdb.d
+      - {{ shared_volumes }}/postgresql/data_dir:/var/lib/postgresql/data
+      - {{ shared_volumes }}/postgresql/sql:/docker-entrypoint-initdb.d
     networks:
       - traefik-public
     deploy:
@@ -30,8 +30,8 @@ services:
       KC_DB_USERNAME: {{ KC_DB_USERNAME }}
       KC_DB_PASSWORD: {{ KC_DB_PASSWORD }}
     volumes:
-      - /data/volumes/keycloak/realm.json:/opt/keycloak/data/import/realm.json
-      - /data/logs/keycloak/keycloak.log:/logs/keycloak.log
+      - {{ shared_volumes }}/keycloak/realm.json:/opt/keycloak/data/import/realm.json
+      - {{ nfs_share_path }}/logs/keycloak/keycloak.log:/logs/keycloak.log
     networks:
       - traefik-public  
     deploy:
@@ -62,8 +62,8 @@ services:
       OIDC_PROVIDER_URL: https://auth.localdomain/realms/vcc/
       OIDC_LOGOUT_URL: https://cloud.localdomain/apps/oidc_login/oidc
     volumes:
-      - /data/nextcloud:/var/www/html
-      - /data/logs/nextcloud/nextcloud.log:/nextcloud.log
+      - {{ nfs_share_path }}/nextcloud:/var/www/html
+      - {{ nfs_share_path }}/logs/nextcloud/nextcloud.log:/nextcloud.log
     extra_hosts:
       - "auth.localdomain:{{ traefik_addr }}"
       - "cloud.localdomain:{{ traefik_addr }}"
@@ -87,9 +87,9 @@ services:
     image: traefik:v2.9.6
     hostname: traefik
     volumes:
-      - /data/volumes/traefik:/etc/traefik
-      - /data/volumes/traefik/certs:/etc/ssl/traefik
-      - /data/logs/traefik:/logs/
+      - {{ shared_volumes }}/traefik:/etc/traefik
+      - {{ shared_volumes }}/traefik/certs:/etc/ssl/traefik
+      - {{ nfs_share_path }}/logs/traefik:/logs/
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - traefik-public
@@ -108,11 +108,9 @@ services:
       LOKI_URL: http://loki:3100/loki/api/v1/push
     networks:
       - traefik-public
-    ports:
-      - 2021:2021
     volumes:
       - /volumes/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
-      - /data/volumes/fluent-bit/parsers.conf:/parsers.conf
+      - {{ shared_volumes }}/fluent-bit/parsers.conf:/parsers.conf
       - /var/lib/docker/containers:/var/lib/docker/containers
       - /var/log/journal:/run/log/journal:ro
       - /run/systemd/journal:/run/systemd/journal:ro
@@ -129,8 +127,8 @@ services:
     networks:
       - traefik-public
     volumes:
-      - /data/volumes/loki/loki.yaml:/etc/loki/local-config.yaml
-      - /data/loki:/loki
+      - {{ shared_volumes }}/loki/loki.yaml:/etc/loki/local-config.yaml
+      - {{ nfs_share_path }}/loki:/loki
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -140,8 +138,6 @@ services:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
-    ports:
-      - 8080:8080
     networks:
       - traefik-public
     deploy:
@@ -153,8 +149,8 @@ services:
     image: prom/prometheus:v2.40.6
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - "{{ shared_volumes }}/prometheus:/config"
-      - /data/prometheus:/prometheus
+      - {{ shared_volumes }}/prometheus:/config
+      - {{ nfs_share_path }}/prometheus:/prometheus
     networks:
       - traefik-public
     command:
@@ -174,10 +170,10 @@ services:
     networks:
       - traefik-public
     volumes:
-      - /data/grafana:/var/lib/grafana
-      - /data/volumes/grafana/datasources:/etc/grafana/provisioning/datasources
-      - /data/volumes/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - /data/volumes/grafana/dashboards_dir:/var/lib/grafana/dashboards
+      - {{ nfs_share_path }}/grafana:/var/lib/grafana
+      - {{ shared_volumes }}/grafana/datasources:/etc/grafana/provisioning/datasources
+      - {{ shared_volumes }}/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - {{ shared_volumes }}/grafana/dashboards_dir:/var/lib/grafana/dashboards
     environment:
       GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
       GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"

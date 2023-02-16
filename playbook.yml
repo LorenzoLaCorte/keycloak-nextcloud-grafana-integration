@@ -3,7 +3,7 @@
   hosts: all
   become: true
   roles:
-    - docker
+    # - docker
 
 - name: Prepare all files for the stack
   hosts: nfs-servers

@@ -6,9 +6,8 @@
 
 - name: Wait for port 5000 to become open on the host
   ansible.builtin.wait_for:
-    host: "{{ registry_url }}"
     port: "{{ registry_port }}"
-    delay: 2
+    delay: 10
 
 - name: Log into private registry with TLS and client certificates
   community.docker.docker_login:

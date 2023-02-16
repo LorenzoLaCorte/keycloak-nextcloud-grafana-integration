@@ -153,7 +153,7 @@ services:
     image: prom/prometheus:v2.40.6
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /data/volumes/prometheus:/config
+      - "{{ shared_volumes }}/prometheus:/config"
       - /data/prometheus:/prometheus
     networks:
       - traefik-public

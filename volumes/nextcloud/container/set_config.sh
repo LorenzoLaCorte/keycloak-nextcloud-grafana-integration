@@ -39,10 +39,10 @@ echo 'Nextcloud ready'
 # trusted domains
 echo "Applying network settings..."
 
-# setString log_type file
-# setString logfile nextcloud.log
-# setString loglevel 0
-# setString logdateformat "F d, Y H:i:s"
+setString log_type file
+setString logfile nextcloud.log
+setString loglevel 0
+setString logdateformat "F d, Y H:i:s"
 
 # Install OpenID Connect login app on Nextcloud
 runOCC app:install oidc_login

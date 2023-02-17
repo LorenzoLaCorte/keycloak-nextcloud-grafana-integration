@@ -2,12 +2,7 @@
 - name: Set file content as a fact
   ansible.builtin.set_fact:
     user_psw: "{{ lookup('file', '{{ psw_file }}').splitlines() | first }}"
-  register: file_content 
-
-- name: Wait for port 5000 to become open on the host
-  ansible.builtin.wait_for:
-    port: "{{ registry_port }}"
-    delay: 10
+  register: file_content
 
 - name: Log into private registry with TLS and client certificates
   community.docker.docker_login:
@@ -21,3 +16,6 @@
     tls_hostname: myregistry.domain.com
     reauthorize: true
     validate_certs: true
+  register: login_result
+  retries: 5
+  until: login_result is success  

@@ -1,7 +1,7 @@
 #
 # Settings
 #
-ANSIBLE_ARGS :=
+ANSIBLE_ARGS := -vv
 ANSIBLE_PLAYBOOK := $(CURDIR)/playbook.yml
 VENV_PATH := $(CURDIR)/venv
 VENV_ACTIVATE_PATH := $(VENV_PATH)/bin/activate
@@ -109,7 +109,7 @@ clean:
 	
 .PHONY: reset
 reset: clean 
-	sudo docker system prune --all ; \
+	sudo docker system prune --all; \
 	sudo rm -r /data/* ; \
 	sudo docker service rm registry
 

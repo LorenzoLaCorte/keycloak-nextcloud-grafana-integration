@@ -17,30 +17,30 @@
   hosts: nfs-servers
   become: true
   roles:
-    - nfs-server
-    - docker_swarm-manager
-    - registry
+    # - nfs-server
+    # - docker_swarm-manager
+    # - registry
     
 - name: NFS client and Swarm worker join
   hosts: nfs-clients
   become: true
   roles:
-    - nfs-client
-    - docker_swarm-worker
+    # - nfs-client
+    # - docker_swarm-worker
     
 - name: Instructing Docker hosts to trust TLS certificate and log into registry
   hosts: all
   become: true
   roles:
-    - registry-tls-common
-    - registry-login
-    - prometheus-common
+    # - registry-tls-common
+    # - registry-login
+    # - prometheus-common
 
 - name: Traefik setup
   hosts: nfs-servers
   become: true
   roles:
-    - traefik
+    # - traefik
 
 - name: Prepare Database and Nextcloud
   hosts: nfs-servers
@@ -48,9 +48,9 @@
   vars_files:
     - "{{ playbook_dir }}/my_secrets/secrets.yml"
   roles:
-    - database
-    - keycloak
-    - nextcloud
+    # - database
+    # - keycloak
+    # - nextcloud
 
 - name: Prepare Logging
   hosts: all

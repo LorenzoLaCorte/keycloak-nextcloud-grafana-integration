@@ -120,6 +120,8 @@ services:
       - /:/rootfs:ro
     deploy:
       mode: global
+      labels:
+        - "prometheus-job=node"
 
   loki:
     image: grafana/loki:2.7.1

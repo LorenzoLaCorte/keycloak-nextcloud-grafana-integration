@@ -1,0 +1,7 @@
+---
+data_dir: "{{ nfs_share_path }}/docker-registry"
+certs_dir: "{{ nfs_share_path }}/docker-registry/certs"
+psw_file: "{{ nfs_share_path }}/docker-registry/user_psw.txt"
+registry_htpasswd_file: "{{ nfs_share_path }}/docker-registry/htpasswd"
+registry_realm: registry_realm
+registry_username: "{{ REGISTRY_USERNAME }}"

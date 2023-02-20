@@ -6,11 +6,15 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
   
-  - job_name: 'dockerswarm'
+  - job_name: 'dockerswarm-cadvisor'
     dockerswarm_sd_configs:
       - host: unix:///var/run/docker.sock
         role: tasks
     relabel_configs:
+      - source_labels: [__address__]
+        target_label: __address__
+        regex: ([^:]+):.* 
+        replacement: $1:8080
       - source_labels: [__meta_dockerswarm_task_desired_state]
         regex: running
         action: keep
@@ -20,16 +24,20 @@ scrape_configs:
       - source_labels: [__meta_dockerswarm_service_label_prometheus_job]
         target_label: job
 
-  - job_name: cadvisor-nodes
-    metrics_path: /metrics
-    static_configs:
-      - targets: 
-        - "{{ hostvars[groups['nfs-servers'][0]]['ansible_host'] }}:8080"
-        - "{{ hostvars[groups['nfs-clients'][0]]['ansible_host'] }}:8080"
-
-  - job_name: node
-    metrics_path: /metrics
-    static_configs:
-      - targets: 
-        - "{{ hostvars[groups['nfs-servers'][0]]['ansible_host'] }}:2021"
-        - "{{ hostvars[groups['nfs-clients'][0]]['ansible_host'] }}:2021"
+  - job_name: 'dockerswarm-exporter'
+    dockerswarm_sd_configs:
+      - host: unix:///var/run/docker.sock
+        role: tasks
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __address__
+        regex: ([^:]+):.* 
+        replacement: $1:2021
+      - source_labels: [__meta_dockerswarm_task_desired_state]
+        regex: running
+        action: keep
+      - source_labels: [__meta_dockerswarm_service_label_prometheus_job]
+        regex: .+
+        action: keep
+      - source_labels: [__meta_dockerswarm_service_label_prometheus_job]
+        target_label: job

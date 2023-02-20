@@ -22,10 +22,16 @@
     - "{{ nfs_share_path }}/logs/keycloak/keycloak.log"
     - "{{ nfs_share_path }}/logs/nextcloud/nextcloud.log"
 
-- name: Copy dir with entrypoints
+- name: Copy volumes
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/volumes"
-    dest: "{{ shared_volumes }}"
+    dest: "{{ nfs_share_path }}"
+    mode: '0777'
+
+- name: "Render registry defaults file using variables"
+  template:
+    src: "{{ shared_volumes }}/registry/registry_default.j2"
+    dest: "{{ playbook_dir }}/roles/registry/defaults/main.yml"
     mode: '0777'
 
 - name: "Render realm.json file using variables"

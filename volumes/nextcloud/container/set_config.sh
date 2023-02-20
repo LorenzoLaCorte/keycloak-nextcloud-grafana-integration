@@ -41,7 +41,7 @@ echo "Applying network settings..."
 
 setString log_type file
 setString logfile nextcloud.log
-setString loglevel 0
+setString loglevel 1
 setString logdateformat "F d, Y H:i:s"
 
 # Install OpenID Connect login app on Nextcloud

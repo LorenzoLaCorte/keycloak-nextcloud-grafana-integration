@@ -1,2 +1,2 @@
 ---
-data_vol: /data/nextcloud
+data_vol: "{{ nfs_share_path }}/nextcloud"

@@ -1,2 +1,6 @@
 ---
-psw_file: /data/docker-registry/user_psw.txt
+data_dir: "{{ nfs_share_path }}/docker-registry"
+src_path: "{{ data_dir }}/certs/fullchain.pem"
+docker_tls: "/etc/docker/certs.d/{{ registry_url }}:{{ registry_port }}"
+psw_file: "{{ data_dir }}/user_psw.txt"
+certs_dir: "{{ data_dir }}/certs"

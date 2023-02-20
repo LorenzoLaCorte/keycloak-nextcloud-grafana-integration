@@ -1,4 +1,17 @@
 ---
+- name: Create certificates directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ docker_tls }}"
+    state: directory
+    mode: '0755'
+
+# If follow=yes, /path/to/file will be overwritten by contents of foo.conf
+- name: Instructing a single Docker host to trust TLS certificate
+  ansible.builtin.copy:
+    src: "{{ src_path }}"
+    dest: "{{ docker_tls }}/ca.crt"  # link to /path/to/file
+    follow: yes
+  
 - name: Set file content as a fact
   ansible.builtin.set_fact:
     user_psw: "{{ lookup('file', '{{ psw_file }}').splitlines() | first }}"
@@ -8,9 +21,9 @@
   community.docker.docker_login:
     registry_url: "https://{{ registry_url }}:{{ registry_port }}"
     tls: yes
-    ca_cert: /data/docker-registry/certs/fullchain.pem
-    client_cert: /data/docker-registry/certs/fullchain.pem
-    client_key: /data/docker-registry/certs/privkey.pem
+    ca_cert: "{{ certs_dir }}/fullchain.pem"
+    client_cert: "{{ certs_dir }}/fullchain.pem"
+    client_key: "{{ certs_dir }}/privkey.pem"
     username: "{{ hostvars['node2'].file_content['ansible_facts']['user_psw'] |  split(':') | first }}"
     password: "{{ hostvars['node2'].file_content['ansible_facts']['user_psw'] |  split(':') | last }}"
     tls_hostname: myregistry.domain.com

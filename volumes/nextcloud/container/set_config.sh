@@ -36,9 +36,12 @@ until runOCC status --output json_pretty | grep 'installed' | grep -q 'true'; do
 done
 echo 'Nextcloud ready'
 
-# trusted domains
 echo "Applying network settings..."
 
+# Trusted domains
+runOCC config:system:set trusted_domains 1 --value="cloud.localdomain"
+
+# Enable logging
 setString log_type file
 setString logfile nextcloud.log
 setString loglevel 1
@@ -48,7 +51,6 @@ setString logdateformat "F d, Y H:i:s"
 runOCC app:install oidc_login
 
 # Setup OpenID Connect login settings on Nextcloud
-# setBoolean use_unauthorized_storage true
 setBoolean allow_user_to_change_display_name false
 setString lost_password_link disabled
 setBoolean oidc_login_disable_registration false
@@ -62,11 +64,6 @@ setString oidc_login_client_id "${OIDC_CLIENT_ID}"
 setString oidc_login_client_secret "${OIDC_CLIENT_SECRET}"
 setString oidc_login_logout_url "${OIDC_LOGOUT_URL}"
 
-# setString overwriteprotocol "https"
-# setString overwritehost "cloud.localdomain"
-# setString overwrite.cli.url "https://cloud.localdomain"
-
-runOCC config:system:set trusted_domains 1 --value="cloud.localdomain"
 runOCC config:system:set --value=preferred_username --type=string -- oidc_login_attributes id
 runOCC config:system:set --value=email --type=string -- oidc_login_attributes mail
 

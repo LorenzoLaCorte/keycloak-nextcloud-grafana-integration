@@ -136,16 +136,24 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 #### loki
 - is deployed through compose with default config and simply stores logs
 
+#### cadvisor
+- deploy cadvisor on the 2 machines
+- map volumes in order to make it collect metrics of containers
+
 #### prometheus
 - is deployed through compose with flag that set retention time and config file
-- its config file exploits docker socket to collect metrics and relabel them thanks to the labels set in the compose
+- its config file exploits docker socket to collect metrics of cadvisor
 
 #### grafana
 - datasources are configured (loki and prometheus)
-- openid is enabled
+- openid is enabled in order to login with keycloak
+- dashboards are implemented:
+  - metrics dashboard uses all the data coming from prometheus exporter
+  - logs dashboard uses all the data coming from tail and systemd plugins
+  - containers dashboard uses all the data coming from cadvisor
 
 ## Others
-- templated secrets
+- templated secrets using jinja2 source files and template module in ansible
 
 # Facilities available
 
@@ -155,7 +163,7 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 
 # TO-DO
 Listed by priority:
-- bug fix in logs dashboard
-- add systemd logs to logs dashboard
-- cadvisor
-- join registry-tls-common and registry-login
+- fix ports bug
+- test the machines
+- erase registry-tls-common
+- registry/defaults hide username?

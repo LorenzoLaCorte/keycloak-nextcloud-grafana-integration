@@ -8,7 +8,7 @@
 - name: Erase nextcloud image in order to re-execute entrypoint.sh
   community.docker.docker_image:
     build:
-      path: "/data/volumes/nextcloud/container/"
+      path: "{{ shared_volumes }}/nextcloud/container/"
       nocache: true
     name: "{{ registry_url }}:{{ registry_port }}/nextcloud"
     source: build
@@ -18,7 +18,7 @@
 - name: Build an image and push it to a private repo
   community.docker.docker_image:
     build:
-      path: "/data/volumes/nextcloud/container/"
+      path: "{{ shared_volumes }}/volumes/nextcloud/container/"
       nocache: true
     name: "{{ registry_url }}:{{ registry_port }}/nextcloud"
     push: true

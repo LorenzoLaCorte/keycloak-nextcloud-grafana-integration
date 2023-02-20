@@ -1,7 +1,7 @@
 #
 # Settings
 #
-ANSIBLE_ARGS := -vv
+ANSIBLE_ARGS := 
 ANSIBLE_PLAYBOOK := $(CURDIR)/playbook.yml
 VENV_PATH := $(CURDIR)/venv
 VENV_ACTIVATE_PATH := $(VENV_PATH)/bin/activate

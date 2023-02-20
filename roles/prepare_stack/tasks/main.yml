@@ -1,17 +1,17 @@
 ---
-- name: Create directories needed for logging if they do not exist
+- name: Create directories needed for logging and data persistance if they do not exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: '0777'
   with_items:
-    - "/data/logs/traefik"
-    - "/data/logs/nextcloud"
-    - "/data/logs/keycloak"
-    - "/data/loki"
-    - "/data/prometheus"
-    - "/data/grafana"
-    - "/data/volumes"
+    - "{{ nfs_share_path }}/logs/traefik"
+    - "{{ nfs_share_path }}/logs/nextcloud"
+    - "{{ nfs_share_path }}/logs/keycloak"
+    - "{{ nfs_share_path }}/loki"
+    - "{{ nfs_share_path }}/prometheus"
+    - "{{ nfs_share_path }}/grafana"
+    - "{{ nfs_share_path }}/volumes"
 
 - name: Create file needed for keycloak logging
   ansible.builtin.file:
@@ -19,23 +19,23 @@
     state: touch
     mode: '0777'
   with_items:
-    - "/data/logs/keycloak/keycloak.log"
-    - "/data/logs/nextcloud/nextcloud.log"
+    - "{{ nfs_share_path }}/logs/keycloak/keycloak.log"
+    - "{{ nfs_share_path }}/logs/nextcloud/nextcloud.log"
 
 - name: Copy dir with entrypoints
   ansible.builtin.copy:
-    src: "{{ playbook_dir }}/volumes/"
-    dest: /data/volumes/
+    src: "{{ playbook_dir }}/volumes"
+    dest: "{{ shared_volumes }}"
     mode: '0777'
 
 - name: "Render realm.json file using variables"
   template:
-    src: "/data/volumes/keycloak/realm.j2"
-    dest: "/data/volumes/keycloak/realm.json"
+    src: "{{ shared_volumes }}/keycloak/realm.j2"
+    dest: "{{ shared_volumes }}/keycloak/realm.json"
     mode: '0777'
 
 - name: "Render prometheus.yml file using variables"
   template:
-    src: "/data/volumes/prometheus/prometheus.j2"
-    dest: "/data/volumes/prometheus/prometheus.yml"
+    src: "{{ shared_volumes }}/prometheus/prometheus.j2"
+    dest: "{{ shared_volumes }}/prometheus/prometheus.yml"
     mode: '0777'

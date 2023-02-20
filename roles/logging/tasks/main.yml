@@ -10,5 +10,5 @@
     
 - name: "Render fluent-bit.conf file using variables"
   template:
-    src: "/data/volumes/fluent-bit/fluent-bit.j2"
+    src: "{{ shared_volumes }}/fluent-bit/fluent-bit.j2"
     dest: "/volumes/fluent-bit/fluent-bit.conf"

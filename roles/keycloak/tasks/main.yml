@@ -2,7 +2,7 @@
 - name: Erase keycloak image in order to re-execute entrypoint
   community.docker.docker_image:
     build:
-      path: "/data/volumes/keycloak/container/"
+      path: "{{ shared_volumes }}/keycloak/container/"
       nocache: true
     name: "{{ registry_url }}:{{ registry_port }}/keycloak"
     source: build
@@ -12,7 +12,7 @@
 - name: Build an image and push it to a private repo
   community.docker.docker_image:
     build:
-      path: "/data/volumes/keycloak/container/"
+      path: "{{ shared_volumes }}/keycloak/container/"
       nocache: true
     name: "{{ registry_url }}:{{ registry_port }}/keycloak"
     push: true

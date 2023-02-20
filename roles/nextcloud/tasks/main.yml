@@ -18,7 +18,7 @@
 - name: Build an image and push it to a private repo
   community.docker.docker_image:
     build:
-      path: "{{ shared_volumes }}/volumes/nextcloud/container/"
+      path: "{{ shared_volumes }}/nextcloud/container/"
       nocache: true
     name: "{{ registry_url }}:{{ registry_port }}/nextcloud"
     push: true

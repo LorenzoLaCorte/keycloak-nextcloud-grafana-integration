@@ -131,6 +131,10 @@ endif
 up:
 	docker stack deploy --compose-file docker-compose.yml $(STACKNAME)
 
+.PHONY: ssh_node1
+ssh_node1:
+	ssh node1@192.168.50.10
+
 .PHONY: ssh_node2
 ssh_node2:
 	ssh node2@192.168.50.20

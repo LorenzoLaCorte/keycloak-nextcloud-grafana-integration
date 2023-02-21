@@ -1,3 +1,0 @@
----
-src_path: /data/docker-registry/certs/fullchain.pem
-docker_tls: "/etc/docker/certs.d/{{ registry_url }}:{{ registry_port }}"

@@ -2,6 +2,8 @@
 - name: Add nodes
   community.docker.docker_swarm: 
     state: join
-    advertise_addr: "{{ hostvars[groups['nfs-clients'][0]]['ansible_host'] }}"
+    advertise_addr: "{{ hostvars[item]['ansible_host'] }}"
     join_token: "{{ hostvars['node1'].swarm_params['swarm_facts']['JoinTokens']['Worker'] }}"
     remote_addrs: [ "{{ hostvars[groups['nfs-servers'][0]]['ansible_host'] }}:2377" ]
+  with_items: 
+    - "{{ groups['nfs-clients'] }}"

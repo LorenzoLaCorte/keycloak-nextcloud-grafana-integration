@@ -28,6 +28,7 @@
     src: "{{ certs_dir }}/fullchain.pem"
     dest: /usr/local/share/ca-certificates/domain.crt  # link to /path/to/file
     follow: yes
+    remote_src: true
 
 - name: Update cert index
   shell: /usr/sbin/update-ca-certificates
@@ -38,39 +39,19 @@
     daemon_reload: yes
     name: docker     
 
-- name: Create random password
-  ansible.builtin.set_fact:
-    reg_password: "{{ lookup('ansible.builtin.password', '/dev/null', seed=inventory_hostname) }}"
-  register: psw_creation_result  
-
-- name: Create setup file with content
-  copy:
-    dest: "{{ psw_file }}"   
-    content: |
-      {{ registry_username }}:{{ hostvars['node1'].psw_creation_result['ansible_facts']['reg_password'] }}
-
 - name: Create htpasswd file
   ansible.builtin.file:
     path: "{{ registry_htpasswd_file }}"
     state: touch
     mode: '0755'
 
-- name: Set file content as a fact
-  ansible.builtin.set_fact:
-    psw_to_insert: "{{ lookup('file', '{{ psw_file }}').splitlines() }}"
-  register: file_content  
-
-- name: Make sure we can use htpasswd module
-  apt: "pkg=python3-passlib state=present"
-
 - name: Insert passwords in htpasswd file
   community.general.htpasswd:
     path: "{{ registry_htpasswd_file }}"
-    name: "{{ item | split(':') | first }}"
-    password: "{{ item | split(':') | last }}"
+    name: "{{ REGISTRY_USER }}"
+    password: "{{ REGISTRY_PASS }}"
     crypt_scheme: bcrypt
-  with_items: "{{ hostvars['node1'].file_content['ansible_facts']['psw_to_insert'] }}"
-     
+
 - name: Deploy Registry
   community.docker.docker_swarm_service:
     name: registry

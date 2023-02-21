@@ -11,7 +11,7 @@
     - "{{ nfs_share_path }}/loki"
     - "{{ nfs_share_path }}/prometheus"
     - "{{ nfs_share_path }}/grafana"
-    - "{{ nfs_share_path }}/volumes"
+    - "{{ nfs_share_path }}/volumes/registry"
 
 - name: Create file needed for keycloak logging
   ansible.builtin.file:
@@ -28,20 +28,14 @@
     dest: "{{ nfs_share_path }}"
     mode: '0777'
 
-- name: "Render registry defaults file using variables"
-  template:
-    src: "{{ shared_volumes }}/registry/registry_default.j2"
-    dest: "{{ playbook_dir }}/roles/registry/defaults/main.yml"
-    mode: '0777'
-
 - name: "Render realm.json file using variables"
   template:
-    src: "{{ shared_volumes }}/keycloak/realm.j2"
+    src: "{{ playbook_dir }}/volumes/keycloak/realm.j2"
     dest: "{{ shared_volumes }}/keycloak/realm.json"
     mode: '0777'
 
 - name: "Render prometheus.yml file using variables"
   template:
-    src: "{{ shared_volumes }}/prometheus/prometheus.j2"
+    src: "{{ playbook_dir }}/volumes/prometheus/prometheus.j2"
     dest: "{{ shared_volumes }}/prometheus/prometheus.yml"
     mode: '0777'

@@ -32,4 +32,7 @@
 
 - name: Install jsondiff
   ansible.builtin.pip:
-    name: jsondiff    
+    name: "{{ item }}"
+  with_items: 
+    - jsondiff
+    - passlib

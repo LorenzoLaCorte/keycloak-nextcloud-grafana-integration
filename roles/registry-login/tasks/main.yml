@@ -5,17 +5,12 @@
     state: directory
     mode: '0755'
 
-# If follow=yes, /path/to/file will be overwritten by contents of foo.conf
 - name: Instructing a single Docker host to trust TLS certificate
   ansible.builtin.copy:
     src: "{{ src_path }}"
     dest: "{{ docker_tls }}/ca.crt"  # link to /path/to/file
     follow: yes
-  
-- name: Set file content as a fact
-  ansible.builtin.set_fact:
-    user_psw: "{{ lookup('file', '{{ psw_file }}').splitlines() | first }}"
-  register: file_content
+    remote_src: true
 
 - name: Log into private registry with TLS and client certificates
   community.docker.docker_login:
@@ -24,8 +19,8 @@
     ca_cert: "{{ certs_dir }}/fullchain.pem"
     client_cert: "{{ certs_dir }}/fullchain.pem"
     client_key: "{{ certs_dir }}/privkey.pem"
-    username: "{{ hostvars['node2'].file_content['ansible_facts']['user_psw'] |  split(':') | first }}"
-    password: "{{ hostvars['node2'].file_content['ansible_facts']['user_psw'] |  split(':') | last }}"
+    username: "{{ REGISTRY_USER }}"
+    password: "{{ REGISTRY_PASS }}"
     tls_hostname: myregistry.domain.com
     reauthorize: true
     validate_certs: true

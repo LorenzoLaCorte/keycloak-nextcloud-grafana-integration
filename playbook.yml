@@ -5,21 +5,12 @@
   roles:
     - docker
 
-- name: Prepare all files for the stack
-  hosts: nfs-servers
-  become: true
-  vars_files:
-    - "{{ playbook_dir }}/my_secrets/secrets.yml"
-  roles:
-    - prepare_stack
-  
 - name: NFS server, Swarm cluster and registry init
   hosts: nfs-servers
   become: true
   roles:
     - nfs-server
     - docker_swarm-manager
-    - registry
     
 - name: NFS client and Swarm worker join
   hosts: nfs-clients
@@ -27,10 +18,28 @@
   roles:
     - nfs-client
     - docker_swarm-worker
-    
+
+- name: Prepare all files for the stack
+  hosts: nfs-servers
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/my_secrets/secrets.yml"
+  roles:
+    - prepare_stack
+
+- name: Registry Init
+  hosts: nfs-servers
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/my_secrets/secrets.yml"
+  roles:
+    - registry
+
 - name: Instructing Docker hosts to trust TLS certificate and log into registry
   hosts: all
   become: true
+  vars_files:
+    - "{{ playbook_dir }}/my_secrets/secrets.yml"
   roles:
     - registry-login
     - prometheus-common

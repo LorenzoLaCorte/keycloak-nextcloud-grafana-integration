@@ -1,9 +1,13 @@
 ---
 - name: Create certificates directory if it does not exist
   ansible.builtin.file:
-    path: "{{ certs_dir }}"
+    path: "{{ item }}"
     state: directory
     mode: '0755'
+  with_items:
+    - "{{ certs_dir }}"
+    - "{{ data_dir }}"
+    - "{{ data_cache_dir }}"
 
 - name: Create private key (RSA, 4096 bits)
   community.crypto.openssl_privatekey:
@@ -56,19 +60,40 @@
   community.docker.docker_swarm_service:
     name: registry
     image: distribution/distribution:2.8.1
-    restart_config: 
-      condition: on-failure
     placement:
       constraints:
         - node.role == manager
     publish:
       - published_port: "{{ registry_port }}"
         target_port: "{{ registry_port }}"
+        mode: "host"  
     mounts:
       - source: "{{ shared_volumes }}/registry/config.yml"
         target: /etc/docker/registry/config.yml
         type: bind
       - source: "{{ data_dir }}"
+        target: /docker-registry
+        type: bind
+      - source: "{{ certs_dir }}"
+        target: /certs
+        type: bind
+
+- name: Deploy Registry cache
+  community.docker.docker_swarm_service:
+    name: registry-cache
+    image: distribution/distribution:2.8.1
+    placement:
+      constraints:
+        - node.role == manager
+    publish:
+      - published_port: 5001
+        target_port: 5001
+        mode: host
+    mounts:
+      - source: "{{ shared_volumes }}/registry/config-cache.yml"
+        target: /etc/docker/registry/config.yml
+        type: bind
+      - source: "{{ data_cache_dir }}"
         target: /docker-registry
         type: bind
       - source: "{{ certs_dir }}"

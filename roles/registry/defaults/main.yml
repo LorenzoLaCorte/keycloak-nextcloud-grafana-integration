@@ -1,6 +1,8 @@
 ---
-data_dir: "/data/docker-registry"
-certs_dir: "/data/docker-registry/certs"
-psw_file: "/data/docker-registry/user_psw.txt"
-registry_htpasswd_file: "/data/docker-registry/htpasswd"
+data_dir: /data/docker-registry
+data_cache_dir: /data/docker-registry-cache
+certs_dir: /data/docker-registry/certs
+psw_file: /data/docker-registry/user_psw.txt
+registry_htpasswd_file: /data/docker-registry/htpasswd
+registry-cache_port: 5001
 registry_realm: registry_realm

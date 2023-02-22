@@ -163,7 +163,9 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 
 # TO-DO
 Listed by priority:
-- fix ports bug
-- test the machines
-- erase registry-tls-common
-- registry/defaults hide username?
+- test secrets
+- registry cache
+- ansible lint
+- nextcloud
+- final tests
+- write readme

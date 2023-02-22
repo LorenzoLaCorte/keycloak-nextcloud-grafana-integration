@@ -1,6 +1,4 @@
 ---
-daemon_file: /etc/docker/daemon.json
-daemon_content: "{\"registry-mirrors\": [\"10.255.255.10:5001\"]}\n{\"metrics-addr\": \"0.0.0.0:9323\", \"experimental\": true}"
 data_dir: "{{ nfs_share_path }}/docker-registry"
 src_path: "{{ data_dir }}/certs/fullchain.pem"
 docker_tls: "/etc/docker/certs.d/{{ registry_url }}:{{ registry_port }}"

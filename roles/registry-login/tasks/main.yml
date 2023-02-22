@@ -1,16 +1,4 @@
 ---
-- name: Create file to specify untrusted registry
-  copy:
-    dest: "{{ daemon_file }}"
-    content: |
-      {{ daemon_content }}
-
-- name: Restart Docker service
-  ansible.builtin.systemd:
-    state: restarted
-    daemon_reload: yes
-    name: docker
-
 - name: Create certificates directory if it does not exist
   ansible.builtin.file:
     path: "{{ docker_tls }}"

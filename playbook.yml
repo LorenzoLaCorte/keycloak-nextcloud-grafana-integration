@@ -10,14 +10,14 @@
   become: true
   roles:
     - nfs-server
-    - docker_swarm-manager
+    #- docker_swarm-manager
     
 - name: NFS client and Swarm worker join
   hosts: nfs-clients
   become: true
   roles:
     - nfs-client
-    - docker_swarm-worker
+    #- docker_swarm-worker
 
 - name: Prepare all files for the stack
   hosts: nfs-servers

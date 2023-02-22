@@ -1,7 +1,7 @@
 #
 # Settings
 #
-ANSIBLE_ARGS := 
+ANSIBLE_ARGS := -v
 ANSIBLE_PLAYBOOK := $(CURDIR)/playbook.yml
 VENV_PATH := $(CURDIR)/venv
 VENV_ACTIVATE_PATH := $(VENV_PATH)/bin/activate
@@ -92,6 +92,7 @@ vcc-roles:
 
 SERVICES := \
 	registry \
+	registry-cache \
 	VCC_stack_postgres \
 	VCC_stack_keycloak \
 	VCC_stack_nextcloud \
@@ -111,7 +112,8 @@ clean:
 reset: clean 
 	sudo docker system prune --all; \
 	sudo rm -r /data/* ; \
-	sudo docker service rm registry
+	sudo docker service rm registry \
+	sudo docker service rm registry-cache
 
 .PHONY: logs
 logs:

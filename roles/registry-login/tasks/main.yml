@@ -1,4 +1,16 @@
 ---
+- name: Create file to specify untrusted registry
+  copy:
+    dest: "{{ daemon_file }}"
+    content: |
+      {{ daemon_content }}
+
+- name: Restart Docker service
+  ansible.builtin.systemd:
+    state: restarted
+    daemon_reload: yes
+    name: docker
+
 - name: Create certificates directory if it does not exist
   ansible.builtin.file:
     path: "{{ docker_tls }}"
@@ -12,6 +24,13 @@
     follow: yes
     remote_src: true
 
+- name: Waiting for registry to be up
+  wait_for:
+    host: "{{ registry_url }}"
+    port: "{{ registry_port }}"
+    delay: 5
+    state: started
+
 - name: Log into private registry with TLS and client certificates
   community.docker.docker_login:
     registry_url: "https://{{ registry_url }}:{{ registry_port }}"
@@ -24,7 +43,3 @@
     tls_hostname: myregistry.domain.com
     reauthorize: true
     validate_certs: true
-  register: login_result
-  retries: 5
-  delay: 2
-  until: login_result is success  

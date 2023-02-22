@@ -2,6 +2,11 @@
 
 Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte (s4784539)
 
+# Setup the Project
+- update ansible_ssh_private_key_file 
+- create my_secrets/secrets.yml with your secrets
+  - an example of the required format is in example/secrets.yml
+
 # Notes 
 
 ## Task 1

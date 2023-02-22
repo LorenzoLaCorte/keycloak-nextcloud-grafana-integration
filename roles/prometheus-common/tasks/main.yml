@@ -1,12 +1,13 @@
 ---
 - name: Create or modify docker daemon
-  copy:
+  ansible.builtin.copy:
     dest: "{{ daemon_file }}"
     content: |
       {{ daemon_content }}
+    mode: '0777'
 
 - name: Restart Docker service
   ansible.builtin.systemd:
     state: restarted
-    daemon_reload: yes
+    daemon_reload: true
     name: docker

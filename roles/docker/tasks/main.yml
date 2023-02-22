@@ -6,7 +6,7 @@
       - ca-certificates
       - lsb-release
       - gnupg
-    state: latest
+    # state: latest # lint doesn't like it
     update_cache: true
 
 - name: Download the GPG signature key for the repository
@@ -27,12 +27,12 @@
       - docker.io
       - docker-compose
       - docker-registry
-    state: latest
+    # state: latest
     update_cache: true
 
 - name: Install jsondiff
   ansible.builtin.pip:
     name: "{{ item }}"
-  with_items: 
+  with_items:
     - jsondiff
     - passlib

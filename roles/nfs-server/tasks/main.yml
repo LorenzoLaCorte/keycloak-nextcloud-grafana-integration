@@ -15,5 +15,6 @@
   ansible.builtin.template:
     src: exports # take the content from src
     dest: /etc/exports # copy it on destination at this path
+    mode: '0777'
   notify:
-  - Restart NFS server # task inside handlers to run action when something has changed
+    - Restart NFS server # task inside handlers to run action when something has changed

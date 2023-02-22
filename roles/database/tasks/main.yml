@@ -5,20 +5,19 @@
     state: directory
     owner: node1
     group: node1
-    #recurse: true
     mode: '0755'
   with_items:
     - "{{ postgres_data_dir }}"
-    - "{{ postgres_scripts_dir }}"  
+    - "{{ postgres_scripts_dir }}"
 
 - name: "Render keycloak.sql with secrets"
-  template:
+  ansible.builtin.template:
     src: "{{ playbook_dir }}/volumes/postgres/sql/keycloak.j2"
     dest: "{{ postgres_scripts_dir }}/keycloak.sql"
     mode: '0755'
 
 - name: "Render nextcloud.sql with secrets"
-  template:
+  ansible.builtin.template:
     src: "{{ playbook_dir }}/volumes/postgres/sql/nextcloud.j2"
     dest: "{{ postgres_scripts_dir }}/nextcloud.sql"
     mode: '0755'

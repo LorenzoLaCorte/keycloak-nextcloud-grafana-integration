@@ -4,7 +4,8 @@
     path: "/etc/hosts"
     state: present
     line: "{{ item[1] }} {{ item[0] }}"
-    create: yes
+    create: true
+    mode: '0777'
   with_nested:
     - ["cloud.localdomain", "auth.localdomain", "mon.localdomain"]
     - ["{{ hostvars['node1']['ansible_host'] }}"]

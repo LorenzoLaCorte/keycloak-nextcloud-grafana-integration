@@ -9,11 +9,12 @@
   ansible.builtin.copy:
     src: "{{ src_path }}"
     dest: "{{ docker_tls }}/ca.crt"  # link to /path/to/file
-    follow: yes
+    follow: true
     remote_src: true
+    mode: '0777'
 
 - name: Waiting for registry to be up
-  wait_for:
+  ansible.builtin.wait_for:
     host: "{{ registry_url }}"
     port: "{{ registry_port }}"
     delay: 5
@@ -22,7 +23,7 @@
 - name: Log into private registry with TLS and client certificates
   community.docker.docker_login:
     registry_url: "https://{{ registry_url }}:{{ registry_port }}"
-    tls: yes
+    tls: true
     ca_cert: "{{ certs_dir }}/fullchain.pem"
     client_cert: "{{ certs_dir }}/fullchain.pem"
     client_key: "{{ certs_dir }}/privkey.pem"
@@ -31,3 +32,7 @@
     tls_hostname: myregistry.domain.com
     reauthorize: true
     validate_certs: true
+  register: login_result
+  retries: 10
+  delay: 10
+  until: login_result is success

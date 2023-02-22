@@ -12,8 +12,8 @@ accesslog:
   filePath: /var/log/traefik/access.log
 
 api:
-  dashboard: true 
-  insecure: true  
+  dashboard: true
+  insecure: true
 
 entryPoints:
   web:
@@ -41,7 +41,7 @@ tls:
 
 providers:
   docker:
-    exposedByDefault: false 
+    exposedByDefault: false
     swarmMode: true
   file:
     directory: /etc/traefik

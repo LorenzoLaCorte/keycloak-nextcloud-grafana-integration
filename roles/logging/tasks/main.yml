@@ -7,8 +7,9 @@
     recurse: true
   with_items:
     - "/volumes/fluent-bit/"
-    
+
 - name: "Render fluent-bit.conf file using variables"
-  template:
+  ansible.builtin.template:
     src: "{{ playbook_dir }}/volumes/fluent-bit/fluent-bit.j2"
     dest: "/volumes/fluent-bit/fluent-bit.conf"
+    mode: '0777'

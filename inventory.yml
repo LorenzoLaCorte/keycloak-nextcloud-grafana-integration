@@ -5,7 +5,7 @@ all:
     node1:
       ansible_host: 10.255.255.10
       ansible_user: node1
-      ansible_ssh_private_key_file: /home/node3/.ssh/id_rsa
+      ansible_ssh_private_key_file: /home/node1/.ssh/id_rsa
       ansible_ssh_common_args: >-
         -o UserKnownHostsFile=/dev/null
         -o StrictHostKeyChecking=no
@@ -13,7 +13,7 @@ all:
     node2:
       ansible_host: 10.255.255.20
       ansible_user: node2
-      ansible_ssh_private_key_file: /home/node3/.ssh/id_rsa
+      ansible_ssh_private_key_file: /home/node1/.ssh/id_rsa
       ansible_ssh_common_args: >-
         -o UserKnownHostsFile=/dev/null
         -o StrictHostKeyChecking=no

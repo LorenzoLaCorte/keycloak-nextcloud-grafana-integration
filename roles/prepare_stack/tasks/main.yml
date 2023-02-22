@@ -1,9 +1,10 @@
 ---
 - name: Create file to specify untrusted registry
-  copy:
+  ansible.builtin.copy:
     dest: "{{ daemon_file }}"
     content: |
       {{ daemon_content }}
+    mode: '0777'
 
 # - name: Restart Docker service
 #   ansible.builtin.systemd:
@@ -41,13 +42,13 @@
     mode: '0777'
 
 - name: "Render realm.json file using variables"
-  template:
+  ansible.builtin.template:
     src: "{{ playbook_dir }}/volumes/keycloak/realm.j2"
     dest: "{{ shared_volumes }}/keycloak/realm.json"
     mode: '0777'
 
 - name: "Render prometheus.yml file using variables"
-  template:
+  ansible.builtin.template:
     src: "{{ playbook_dir }}/volumes/prometheus/prometheus.j2"
     dest: "{{ shared_volumes }}/prometheus/prometheus.yml"
     mode: '0777'

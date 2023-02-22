@@ -13,9 +13,9 @@ http:
     X-Content-Type-Options: [nosniff]
   tls:
     certificate: /certs/fullchain.pem
-    key: /certs/privkey.pem   
+    key: /certs/privkey.pem
 proxy:
-  remote_url: https://registry-1.docker.io     
+  remote_url: https://registry-1.docker.io
 health:
   storagedriver:
     enabled: true

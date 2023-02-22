@@ -12,7 +12,7 @@
 
 - name: Mount NFS
   ansible.posix.mount:
-    src: "{{ hostvars[ groups['nfs-servers'] | first ]['ansible_host'] }}:{{ nfs_share_path }}"
+    src: "{{ hostvars[groups['nfs-servers'] | first]['ansible_host'] }}:{{ nfs_share_path }}"
     path: "{{ nfs_share_path }}"
     opts: rw
     fstype: nfs

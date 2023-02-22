@@ -14,14 +14,14 @@
     path: "{{ certs_dir }}/privkey.pem"
 
 - name: Generate an OpenSSL CSR.
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: "{{ certs_dir }}/domain.csr"
     privatekey_path: "{{ certs_dir }}/privkey.pem"
     common_name: myregistry.domain.com
-    subject_alt_name: "IP:{{ registry_url }}" 
+    subject_alt_name: "IP:{{ registry_url }}"
 
 - name: Generate a Self Signed OpenSSL certificate.
-  openssl_certificate:
+  community.crypto.x509_certificate:
     path: "{{ certs_dir }}/fullchain.pem"
     privatekey_path: "{{ certs_dir }}/privkey.pem"
     csr_path: "{{ certs_dir }}/domain.csr"
@@ -31,17 +31,18 @@
   ansible.builtin.copy:
     src: "{{ certs_dir }}/fullchain.pem"
     dest: /usr/local/share/ca-certificates/domain.crt  # link to /path/to/file
-    follow: yes
+    follow: true
     remote_src: true
+    mode: '0777'
 
 - name: Update cert index
-  shell: /usr/sbin/update-ca-certificates
+  ansible.builtin.shell: /usr/sbin/update-ca-certificates
 
 - name: Restart Docker service
   ansible.builtin.systemd:
     state: restarted
-    daemon_reload: yes
-    name: docker     
+    daemon_reload: true
+    name: docker
 
 - name: Create htpasswd file
   ansible.builtin.file:
@@ -55,28 +56,37 @@
     name: "{{ REGISTRY_USER }}"
     password: "{{ REGISTRY_PASS }}"
     crypt_scheme: bcrypt
+    mode: '0777'
 
 - name: Deploy Registry
   community.docker.docker_swarm_service:
     name: registry
     image: distribution/distribution:2.8.1
+    restart_config:
+      condition: on-failure
     placement:
       constraints:
         - node.role == manager
     publish:
-      - published_port: "{{ registry_port }}"
-        target_port: "{{ registry_port }}"
-        mode: "host"  
+      - published_port: 5000
+        target_port: 5000
     mounts:
       - source: "{{ shared_volumes }}/registry/config.yml"
         target: /etc/docker/registry/config.yml
         type: bind
-      - source: "{{ data_dir }}"
+      - source: /data/docker-registry
         target: /docker-registry
         type: bind
-      - source: "{{ certs_dir }}"
+      - source: /data/docker-registry/certs
         target: /certs
         type: bind
+
+- name: Copy certificates
+  ansible.builtin.copy:
+    src: "{{ certs_dir }}"
+    dest: "{{ data_cache_dir }}"
+    mode: '0777'
+    remote_src: true
 
 - name: Deploy Registry cache
   community.docker.docker_swarm_service:
@@ -90,12 +100,12 @@
         target_port: 5001
         mode: host
     mounts:
-      - source: "{{ shared_volumes }}/registry/config-cache.yml"
+      - source: "{{ shared_volumes }}/registry_cache/config-cache.yml"
         target: /etc/docker/registry/config.yml
         type: bind
       - source: "{{ data_cache_dir }}"
-        target: /docker-registry
+        target: /docker-registry-cache
         type: bind
-      - source: "{{ certs_dir }}"
+      - source: "{{ certs_cache_dir }}"
         target: /certs
         type: bind

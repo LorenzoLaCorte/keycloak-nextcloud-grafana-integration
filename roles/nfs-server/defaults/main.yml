@@ -1,5 +1,5 @@
 ---
 # specify options for export
 nfs_export_options:
-- rw
-- no_root_squash
+  - rw
+  - no_root_squash

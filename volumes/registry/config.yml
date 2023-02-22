@@ -13,15 +13,11 @@ http:
     X-Content-Type-Options: [nosniff]
   tls:
     certificate: /certs/fullchain.pem
-    key: /certs/privkey.pem  
+    key: /certs/privkey.pem
 auth:
   htpasswd:
     realm: registry_realm
     path: /docker-registry/htpasswd
-#proxy:
-#  remote_url: https://registry-1.docker.io
-#  username: username
-#  password: password     
 health:
   storagedriver:
     enabled: true

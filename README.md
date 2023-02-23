@@ -169,9 +169,6 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 
 # TO-DO
 Listed by priority:
-- test secrets
-- registry cache
 - ansible lint
-- nextcloud
 - final tests
 - write readme

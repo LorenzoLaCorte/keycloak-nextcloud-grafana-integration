@@ -94,7 +94,7 @@ vcc-roles:
 
 SERVICES := \
 	registry \
-	registry_cache \
+	registry-cache \
 	VCC_stack_postgres \
 	VCC_stack_keycloak \
 	VCC_stack_nextcloud \

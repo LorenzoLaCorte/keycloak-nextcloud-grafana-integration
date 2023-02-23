@@ -1,8 +1,8 @@
 ---
-data_dir: /data/docker-registry
-data_cache_dir: /data/docker-registry-cache
-certs_dir: /data/docker-registry/certs
-certs_cache_dir: /data/docker-registry-cache/certs
-psw_file: /data/docker-registry/user_psw.txt
-registry_htpasswd_file: /data/docker-registry/htpasswd
+data_dir: "{{ nfs_share_path }}/docker-registry"
+data_cache_dir: "{{ nfs_share_path }}/docker-registry-cache"
+certs_dir: "{{ data_dir }}/certs"
+certs_cache_dir: "{{ data_cache_dir }}/certs"
+psw_file: "{{ data_dir }}/user_psw.txt"
+registry_htpasswd_file: "{{ data_dir }}/htpasswd"
 registry_realm: registry_realm

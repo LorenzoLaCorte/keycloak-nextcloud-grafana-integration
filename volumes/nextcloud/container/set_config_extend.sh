@@ -6,23 +6,7 @@ until curl -sSf http://keycloak:8080; do
 done
 echo 'Keycloak alive'
 
-# -- Ensure that 2 replicas will not install nextcloud at the same time -- #
-
-# let's do it with a lock
-LOCK=/var/www/html/check_install.lock
-
-# initialize a flag that will be set to 1 if another instance is installing
-another_instance=0
-# 3600-second timeout to the lock, so the script is executed if there is a stale lock
-lockfile -r 0 -l 3600 "$LOCK" || another_instance=1
-
-# ensure that whenever the script exits, remove_lock will be called
-trap remove_lock EXIT
-
-# check if I'm the first replica and so I need to install nextcloud
-if [ $another_instance -eq 0 ]; do
-    /entrypoint.sh apache2-foreground &
-done
+/entrypoint.sh apache2-foreground &
 
 res=1
 until [ $res -eq 0 ]; do
@@ -40,7 +24,6 @@ echo "Nextcloud setup done"
 runOCC() {
     sudo -E -u www-data php occ "$@"
 }
-
 setBoolean() { runOCC config:system:set --value="$2" --type=boolean -- "$1"; }
 setInteger() { runOCC config:system:set --value="$2" --type=integer -- "$1"; }
 setString() { runOCC config:system:set --value="$2" --type=string -- "$1"; }

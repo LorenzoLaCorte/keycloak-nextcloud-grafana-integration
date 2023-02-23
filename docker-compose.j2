@@ -72,6 +72,8 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
+      mode: replicated
+      replicas: 2
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.nextcloud_route.rule=Host(`cloud.localdomain`)"

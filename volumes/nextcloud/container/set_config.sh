@@ -1,12 +1,26 @@
 #!/bin/sh
 
+remove_lock()
+{
+    rm -rf "$LOCK"
+}
+
 # Wait until Keycloak is alive
 until curl -sSf http://keycloak:8080; do
     sleep 1
 done
 echo 'Keycloak alive'
 
-/entrypoint.sh apache2-foreground &
+# -- Ensure that 2 replicas will not install nextcloud at the same time -- #
+
+# let's do it with a lock
+LOCK=/check_install.lock
+
+# 3600-second timeout to the lock, so the script is executed if there is a stale lock
+lockfile -r 0 -l 3600 "$LOCK" && /entrypoint.sh apache2-foreground & || echo "not "
+
+# ensure that whenever the script exits, remove_lock will be called
+trap remove_lock EXIT
 
 res=1
 until [ $res -eq 0 ]; do
@@ -24,6 +38,7 @@ echo "Nextcloud setup done"
 runOCC() {
     sudo -E -u www-data php occ "$@"
 }
+
 setBoolean() { runOCC config:system:set --value="$2" --type=boolean -- "$1"; }
 setInteger() { runOCC config:system:set --value="$2" --type=integer -- "$1"; }
 setString() { runOCC config:system:set --value="$2" --type=string -- "$1"; }

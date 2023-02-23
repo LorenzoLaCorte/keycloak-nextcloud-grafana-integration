@@ -35,8 +35,8 @@
     remote_src: true
     mode: '0777'
 
-# - name: Update cert index
-#   ansible.builtin.shell: /usr/sbin/update-ca-certificates
+- name: Update cert index
+  ansible.builtin.shell: /usr/sbin/update-ca-certificates
 
 - name: Restart Docker service
   ansible.builtin.systemd:
@@ -68,16 +68,16 @@
       constraints:
         - node.role == manager
     publish:
-      - published_port: 5000
-        target_port: 5000
+      - published_port: "{{ registry_port }}"
+        target_port: "{{ registry_port }}"
     mounts:
       - source: "{{ shared_volumes }}/registry/config.yml"
         target: /etc/docker/registry/config.yml
         type: bind
-      - source: /data/docker-registry
+      - source: "{{ data_dir }}"
         target: /docker-registry
         type: bind
-      - source: /data/docker-registry/certs
+      - source: "{{ certs_dir }}"
         target: /certs
         type: bind
 
@@ -96,8 +96,8 @@
       constraints:
         - node.role == manager
     publish:
-      - published_port: 5001
-        target_port: 5001
+      - published_port: "{{ registry_cache_port }}"
+        target_port: "{{ registry_cache_port }}"
         mode: host
     mounts:
       - source: "{{ shared_volumes }}/registry_cache/config-cache.yml"

@@ -11,9 +11,16 @@ echo 'Keycloak alive'
 # let's do it with a lock
 LOCK=/var/lock/check_install.lock
 
-flag=0
 # 3600-second timeout to the lock, so the script is executed if there is a stale lock
-sudo -u www-data lockfile -r 0 -l 3600 "$LOCK" && flag=1 && /entrypoint.sh apache2-foreground &
+sudo -u www-data lockfile -r 0 -l 3600 "$LOCK"
+
+# set to 0 if I am the first to enter, to 73 if I am the second
+hasLock=$? 
+echo "hasLock is: $hasLock"
+
+if [ $hasLock -eq 0 ]; then
+    /entrypoint.sh apache2-foreground &
+fi
 
 res=1
 until [ $res -eq 0 ]; do
@@ -45,7 +52,8 @@ done
 echo 'Nextcloud ready'
 
 
-if [ $flag -eq 1 ]; then
+echo "hasLock is: $hasLock"
+if [ $hasLock -eq 0 ]; then
     echo "Applying network settings..."
 
     # Trusted domains
@@ -77,7 +85,7 @@ if [ $flag -eq 1 ]; then
     runOCC config:system:set --value=preferred_username --type=string -- oidc_login_attributes id
     runOCC config:system:set --value=email --type=string -- oidc_login_attributes mail
 
-    sudo -u www-data rm -rf "$LOCK"
+    # sudo -u www-data rm -rf "$LOCK"
     tail -f /var/www/html/nextcloud.log
 else
     apache2-foreground

@@ -85,6 +85,9 @@ services:
         - "traefik.http.routers.nextcloud_route.middlewares=VCC_stack_nextcloud_proto"
         - "traefik.http.services.VCC_stack_nextcloud.loadbalancer.server.port=80"
         - "traefik.http.middlewares.VCC_stack_nextcloud_proto.headers.customrequestheaders.X-Forwarded-Proto=https" 
+        - "traefik.http.services.VCC_stack_nextcloud.loadbalancer.sticky=true"
+        - "traefik.http.services.VCC_stack_nextcloud.loadbalancer.sticky.cookie.name=StickyCookie"
+        - "traefik.http.services.VCC_stack_nextcloud.loadbalancer.sticky.cookie.secure=true"
 
   traefik:
     image: traefik:v2.9.6

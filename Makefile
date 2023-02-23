@@ -74,7 +74,7 @@ VCC_ROLES := \
 	docker \
 	docker_swarm_manager \
 	docker_swarm_worker \
-	docker-commn \
+	docker_commn \
 	keycloak \
 	logging \
 	monitoring \
@@ -82,9 +82,11 @@ VCC_ROLES := \
 	nfs_client \
 	nfs_server \
 	prepare_stack \
+	prometheus_common \
 	registry \
-	registry-client \
-	registry-tls-common
+	registry_login \
+	stack \
+	traefik
 	
 .PHONY: vcc-roles
 vcc-roles:
@@ -92,7 +94,7 @@ vcc-roles:
 
 SERVICES := \
 	registry \
-	registry-cache \
+	registry_cache \
 	VCC_stack_postgres \
 	VCC_stack_keycloak \
 	VCC_stack_nextcloud \
@@ -112,7 +114,7 @@ clean:
 reset: clean 
 	sudo docker system prune --all; \
 	sudo rm -r /data/* ; \
-	sudo docker service rm registry \
+	sudo docker service rm registry ; \
 	sudo docker service rm registry-cache
 
 .PHONY: logs

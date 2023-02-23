@@ -34,4 +34,5 @@ all:
         shared_volumes: "{{ nfs_share_path }}/volumes"
         registry_url: 10.255.255.10
         registry_port: 5000
+        registry_cache_port: 5001
         traefik_addr: 192.168.50.10

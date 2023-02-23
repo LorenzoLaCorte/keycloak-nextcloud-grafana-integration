@@ -72,15 +72,15 @@ VCC_ROLES := \
 	dashboard \
 	database \
 	docker \
-	docker_swarm-manager \
-	docker_swarm-worker \
+	docker_swarm_manager \
+	docker_swarm_worker \
 	docker-commn \
 	keycloak \
 	logging \
 	monitoring \
 	nextcloud \
-	nfs-client \
-	nfs-server \
+	nfs_client \
+	nfs_server \
 	prepare_stack \
 	registry \
 	registry-client \

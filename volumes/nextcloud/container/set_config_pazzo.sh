@@ -40,6 +40,7 @@ echo "Nextcloud setup done"
 runOCC() {
     sudo -E -u www-data php occ "$@"
 }
+
 setBoolean() { runOCC config:system:set --value="$2" --type=boolean -- "$1"; }
 setInteger() { runOCC config:system:set --value="$2" --type=integer -- "$1"; }
 setString() { runOCC config:system:set --value="$2" --type=string -- "$1"; }

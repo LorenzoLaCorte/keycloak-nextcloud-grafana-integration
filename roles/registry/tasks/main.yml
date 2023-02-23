@@ -35,8 +35,8 @@
     remote_src: true
     mode: '0777'
 
-- name: Update cert index
-  ansible.builtin.shell: /usr/sbin/update-ca-certificates
+# - name: Update cert index
+#   ansible.builtin.shell: /usr/sbin/update-ca-certificates
 
 - name: Restart Docker service
   ansible.builtin.systemd:

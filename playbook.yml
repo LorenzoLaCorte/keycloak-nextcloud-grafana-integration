@@ -9,15 +9,15 @@
   hosts: nfs-servers
   become: true
   roles:
-    - nfs-server
-    - docker_swarm-manager
+    - nfs_server
+    - docker_swarm_manager
 
 - name: NFS client and Swarm worker join
   hosts: nfs-clients
   become: true
   roles:
-    - nfs-client
-    - docker_swarm-worker
+    - nfs_client
+    - docker_swarm_worker
 
 - name: Prepare all files for the stack
   hosts: nfs-servers
@@ -41,7 +41,7 @@
   vars_files:
     - "{{ playbook_dir }}/my_secrets/secrets.yml"
   roles:
-    - registry-login
+    - registry_login
 
 - name: Traefik setup
   hosts: nfs-servers

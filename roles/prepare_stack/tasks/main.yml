@@ -1,17 +1,4 @@
 ---
-- name: Create file to specify untrusted registry
-  ansible.builtin.copy:
-    dest: "{{ daemon_file }}"
-    content: |
-      {{ daemon_content }}
-    mode: '0777'
-
-# - name: Restart Docker service
-#   ansible.builtin.systemd:
-#     state: restarted
-#     daemon_reload: yes
-#     name: docker
-
 - name: Create directories needed for logging and data persistance if they do not exist
   ansible.builtin.file:
     path: "{{ item }}"
@@ -22,6 +9,7 @@
     - "{{ nfs_share_path }}/logs/nextcloud"
     - "{{ nfs_share_path }}/logs/keycloak"
     - "{{ nfs_share_path }}/loki"
+    - "{{ nfs_share_path }}/lock"
     - "{{ nfs_share_path }}/prometheus"
     - "{{ nfs_share_path }}/grafana"
     - "{{ nfs_share_path }}/volumes/registry"

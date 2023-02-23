@@ -64,6 +64,7 @@ services:
     volumes:
       - {{ nfs_share_path }}/nextcloud:/var/www/html
       - {{ nfs_share_path }}/logs/nextcloud/nextcloud.log:/nextcloud.log
+      - {{ nfs_share_path }}/lock:/var/lock
     extra_hosts:
       - "auth.localdomain:{{ traefik_addr }}"
       - "cloud.localdomain:{{ traefik_addr }}"

@@ -1,3 +1,1 @@
 ---
-daemon_file: /etc/docker/daemon.json
-daemon_content: "{\"registry-mirrors\": [\"https://10.255.255.10:5001\"]}\n{\"metrics-addr\": \"0.0.0.0:9323\", \"experimental\": true}"

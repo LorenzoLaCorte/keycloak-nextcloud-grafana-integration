@@ -1,10 +1,5 @@
 #!/bin/sh
 
-remove_lock()
-{
-    rm -rf "$LOCK"
-}
-
 # Wait until Keycloak is alive
 until curl -sSf http://keycloak:8080; do
     sleep 1
@@ -14,13 +9,11 @@ echo 'Keycloak alive'
 # -- Ensure that 2 replicas will not install nextcloud at the same time -- #
 
 # let's do it with a lock
-LOCK=/check_install.lock
+LOCK=/var/lock/check_install.lock
 
+flag=0
 # 3600-second timeout to the lock, so the script is executed if there is a stale lock
-lockfile -r 0 -l 3600 "$LOCK" && /entrypoint.sh apache2-foreground & || echo "not "
-
-# ensure that whenever the script exits, remove_lock will be called
-trap remove_lock EXIT
+sudo -u www-data lockfile -r 0 -l 3600 "$LOCK" && flag=1 && /entrypoint.sh apache2-foreground &
 
 res=1
 until [ $res -eq 0 ]; do
@@ -51,35 +44,41 @@ until runOCC status --output json_pretty | grep 'installed' | grep -q 'true'; do
 done
 echo 'Nextcloud ready'
 
-echo "Applying network settings..."
 
-# Trusted domains
-runOCC config:system:set trusted_domains 1 --value="cloud.localdomain"
+if [ $flag -eq 1 ]; then
+    echo "Applying network settings..."
 
-# Enable logging
-setString log_type file
-setString logfile nextcloud.log
-setString loglevel 1
-setString logdateformat "F d, Y H:i:s"
+    # Trusted domains
+    runOCC config:system:set trusted_domains 1 --value="cloud.localdomain"
 
-# Install OpenID Connect login app on Nextcloud
-runOCC app:install oidc_login
+    # Enable logging
+    setString log_type file
+    setString logfile nextcloud.log
+    setString loglevel 1
+    setString logdateformat "F d, Y H:i:s"
 
-# Setup OpenID Connect login settings on Nextcloud
-setBoolean allow_user_to_change_display_name false
-setString lost_password_link disabled
-setBoolean oidc_login_disable_registration false
-setBoolean oidc_login_tls_verify false
-setBoolean oidc_login_end_session_redirect true
-setBoolean oidc_login_auto_redirect true
-setBoolean oidc_login_redir_fallback true
+    # Install OpenID Connect login app on Nextcloud
+    runOCC app:install oidc_login
 
-setString oidc_login_provider_url "${OIDC_PROVIDER_URL}"
-setString oidc_login_client_id "${OIDC_CLIENT_ID}"
-setString oidc_login_client_secret "${OIDC_CLIENT_SECRET}"
-setString oidc_login_logout_url "${OIDC_LOGOUT_URL}"
+    # Setup OpenID Connect login settings on Nextcloud
+    setBoolean allow_user_to_change_display_name false
+    setString lost_password_link disabled
+    setBoolean oidc_login_disable_registration false
+    setBoolean oidc_login_tls_verify false
+    setBoolean oidc_login_end_session_redirect true
+    setBoolean oidc_login_auto_redirect true
+    setBoolean oidc_login_redir_fallback true
 
-runOCC config:system:set --value=preferred_username --type=string -- oidc_login_attributes id
-runOCC config:system:set --value=email --type=string -- oidc_login_attributes mail
+    setString oidc_login_provider_url "${OIDC_PROVIDER_URL}"
+    setString oidc_login_client_id "${OIDC_CLIENT_ID}"
+    setString oidc_login_client_secret "${OIDC_CLIENT_SECRET}"
+    setString oidc_login_logout_url "${OIDC_LOGOUT_URL}"
 
-tail -f /var/www/html/nextcloud.log
+    runOCC config:system:set --value=preferred_username --type=string -- oidc_login_attributes id
+    runOCC config:system:set --value=email --type=string -- oidc_login_attributes mail
+
+    sudo -u www-data rm -rf "$LOCK"
+    tail -f /var/www/html/nextcloud.log
+else
+    apache2-foreground
+fi

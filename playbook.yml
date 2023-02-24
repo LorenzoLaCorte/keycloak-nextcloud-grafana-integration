@@ -20,6 +20,14 @@
     - docker_swarm_worker
 
 - name: Prepare all files for the stack
+  hosts: all
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/my_secrets/secrets.yml"
+  roles:
+    - prometheus_common
+
+- name: Prepare all files for the stack
   hosts: nfs-servers
   become: true
   vars_files:

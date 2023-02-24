@@ -1,6 +1,5 @@
 ---
-# each element is a task
-- name: Install NFS client # task name (useful for log)
+- name: Install NFS client
   ansible.builtin.apt:
     name: nfs-common
 

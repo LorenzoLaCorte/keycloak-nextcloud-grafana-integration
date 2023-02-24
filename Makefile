@@ -29,7 +29,7 @@ run-ansible: ansible-prepare
 .PHONY: run-ansible
 run-ansible-lint: update-venv
 	. $(VENV_ACTIVATE_PATH) && ansible-lint \
-		--format rich \
+		--format full \
 		--profile production \
 		$(ANSIBLE_PLAYBOOK)
 
@@ -69,15 +69,12 @@ update-venv: venv
 # VCC
 #
 VCC_ROLES := \
-	dashboard \
 	database \
 	docker \
 	docker_swarm_manager \
 	docker_swarm_worker \
-	docker_commn \
 	keycloak \
 	logging \
-	monitoring \
 	nextcloud \
 	nfs_client \
 	nfs_server \

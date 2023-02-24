@@ -5,7 +5,7 @@
     state: directory
     mode: '0755'
 
-- name: Erase nextcloud image in order to re-execute entrypoint.sh
+- name: Erase nextcloud image in order to update entrypoint
   community.docker.docker_image:
     build:
       path: "{{ shared_volumes }}/nextcloud/container/"

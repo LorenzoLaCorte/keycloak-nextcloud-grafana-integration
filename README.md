@@ -8,6 +8,15 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
   - an example of the required format is in example/secrets.yml
   - for testing purposes, just copy it under secrets.yml
 
+# Notes for the Professor
+- ansible-lint check gives only a warning related to the use of shell
+  - the shell module is used only once
+  - it's necessary in order to update the CA trusted by our system
+
+- some tasks are necessary were necessary in production
+  - nextcloud and keycloak image is erased before re-built, in order to forcely update the entrypoint
+  - since our docker version apparently leaves ports open also when the container is down, we have introduced a retry condition in the registry-login task, in order to make it work also when re-running the project  
+
 # Notes 
 
 ## Task 1
@@ -166,9 +175,3 @@ Authors: Simone Aquilini (s5667729) - Luca Ferrari (s4784573) - Lorenzo La Corte
 - `make run-ansible` runs the Ansible playbook
 - `make run-ansible-lint` runs the Ansible playbook linter
 - An example inside of `examples` of the integration between Nextcloud and Keycloak
-
-# TO-DO
-Listed by priority:
-- ansible lint
-- final tests
-- write readme

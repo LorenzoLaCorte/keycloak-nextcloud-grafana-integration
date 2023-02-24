@@ -119,7 +119,6 @@ services:
       - {{ shared_volumes }}/fluent-bit/parsers.conf:/parsers.conf
       - /var/lib/docker/containers:/var/lib/docker/containers
       - /var/log/journal:/run/log/journal:ro
-      - /run/systemd/journal:/run/systemd/journal:ro
       - /var/run/systemd/journal:/var/run/systemd/journal:ro
       - /proc:/host/proc
       - /sys:/host/sys
@@ -167,7 +166,7 @@ services:
       - "--log.level=info"
     depends_on:
       - cadvisor
-    user: 65534:120
+    user: root
     deploy:
       placement:
         constraints:

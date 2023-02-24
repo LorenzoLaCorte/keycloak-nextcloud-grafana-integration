@@ -1,5 +1,5 @@
 ---
-- name: "Render docker-compose file using variables"
+- name: Render docker-compose file using variables
   ansible.builtin.template:
     src: "{{ playbook_dir }}/docker-compose.j2"
     dest: "/docker-compose.yml"

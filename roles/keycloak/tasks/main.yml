@@ -1,5 +1,5 @@
 ---
-- name: Erase keycloak image in order to re-execute entrypoint
+- name: Erase keycloak image in order to update entrypoint
   community.docker.docker_image:
     build:
       path: "{{ shared_volumes }}/keycloak/container/"

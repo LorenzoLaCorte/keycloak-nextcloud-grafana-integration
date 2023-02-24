@@ -16,12 +16,13 @@ sudo -u www-data lockfile -r 0 -l 3600 "$LOCK"
 
 # set to 0 if I am the first to enter, to 73 if I am the second
 hasLock=$? 
-echo "hasLock is: $hasLock"
+echo "hasLock is: $hasLock" # check the return value
 
 if [ $hasLock -eq 0 ]; then
     /entrypoint.sh apache2-foreground &
 fi
 
+# both wait for nextcloud to be setup
 res=1
 until [ $res -eq 0 ]; do
     sleep 1
@@ -51,7 +52,7 @@ until runOCC status --output json_pretty | grep 'installed' | grep -q 'true'; do
 done
 echo 'Nextcloud ready'
 
-
+# only one of the two containers will apply network settings installing oidc
 echo "hasLock is: $hasLock"
 if [ $hasLock -eq 0 ]; then
     echo "Applying network settings..."
@@ -85,7 +86,6 @@ if [ $hasLock -eq 0 ]; then
     runOCC config:system:set --value=preferred_username --type=string -- oidc_login_attributes id
     runOCC config:system:set --value=email --type=string -- oidc_login_attributes mail
 
-    # sudo -u www-data rm -rf "$LOCK"
     tail -f /var/www/html/nextcloud.log
 else
     apache2-foreground
